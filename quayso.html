@@ -355,7 +355,29 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Danh sách giải thưởng</label>
-                        <textarea name="prizes" id="sessionPrizeInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none font-mono text-xs md:text-sm" rows="6"></textarea>
+                        <<div class="mb-4">
+    <label class="block text-sm font-bold mb-2">
+        Danh sách phần thưởng (Tên,Rate)
+    </label>
+
+    <textarea 
+        name="prizes"
+        rows="8"
+        required
+        class="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        placeholder="Ví dụ:
+Nụ hôn,10
+5.000 VND,20
+10.000 VND,30
+20.000 VND,40"
+    ></textarea>
+
+    <p class="text-xs text-gray-500 mt-2">
+        ✔ Mỗi dòng 1 phần thưởng theo format: <b>Tên,Rate</b><br>
+        ✔ Tổng tất cả Rate phải bằng 100
+    </p>
+</div>
+ id="sessionPrizeInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none font-mono text-xs md:text-sm" rows="6"></textarea>
                         <p class="text-[10px] md:text-xs text-gray-500 mt-1">Gợi ý: Nhập đúng "500.000 VND" để hiện ảnh tiền.</p>
                     </div>
                 </div>
