@@ -875,8 +875,7 @@
             e.preventDefault();
             const formData = new FormData(e.target);
             const name = formData.get('name').trim();
-            const prizes = (formData.get('prizes') || "").split('\n').filter(n => n.trim() !== '');
-
+            
             if (!name) { alert("Vui lòng nhập tên đợt lì xì!"); return; }
             if (prizes.length === 0) { alert("Vui lòng nhập ít nhất một giải thưởng!"); return; }
 
