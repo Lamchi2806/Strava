@@ -1,4 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quay số lì xì</title>
+
+<!-- Tailwind (dev only) -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="bg-gray-100 p-10">
+
+<div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
+
+<h2 class="text-xl font-bold mb-4">Tạo chương trình mới</h2>
+
+<form id="createForm">
+
+<input name="name" placeholder="Tên chương trình"
+class="w-full border p-2 mb-2" required />
+
+<input name="pin" placeholder="Mã PIN"
+class="w-full border p-2 mb-2" />
+
+<textarea name="description" placeholder="Mô tả"
+class="w-full border p-2 mb-2"></textarea>
+
+<textarea name="prizes"
+placeholder="Ví dụ:
+Nụ hôn,10
+10.000 VND,20
+50.000 VND,30
+100.000 VND,40"
+class="w-full border p-2 mb-2 h-40"></textarea>
+
+<button type="submit"
+class="bg-blue-500 text-white px-4 py-2 rounded">
+Tạo ngay
+</button>
+
+</form>
+
+<hr class="my-6">
+
+<h2 class="text-xl font-bold mb-4">Quay thử</h2>
+
+<input id="playerName" placeholder="Tên người chơi"
+class="w-full border p-2 mb-2" />
+
+<input id="playerAccount" placeholder="Số tài khoản"
+class="w-full border p-2 mb-2" />
+
+<button onclick="handleSpin()"
+class="bg-green-500 text-white px-4 py-2 rounded">
+Quay
+</button>
+
+</div>
+
 <script>
+/* ================= SUPABASE CONFIG ================= */
+
 const supabaseClient = supabase.createClient(
     'https://nqxlwaitqcjurjuvurlr.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xeGx3YWl0cWNqdXJqdXZ1cmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3ODY1NjIsImV4cCI6MjA4NjM2MjU2Mn0.OBgHJu8o0P5TxA9y5St0kRxioAk4X551ntRIEw-HeWk'
@@ -9,22 +73,20 @@ let currentPrizes = [];
 
 /* ================= CREATE SESSION ================= */
 
+document.getElementById("createForm")
+    .addEventListener("submit", handleCreateSession);
+
 async function handleCreateSession(e) {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const name = formData.get('name').trim();
+    const name = formData.get('name')?.trim();
     const description = formData.get('description');
     const pin = formData.get('pin');
     const prizeInput = (formData.get('prizes') || "").trim();
 
-    if (!name) {
-        alert("Nhập tên chương trình");
-        return;
-    }
-
-    if (!prizeInput) {
-        alert("Nhập danh sách phần thưởng");
+    if (!name || !prizeInput) {
+        alert("Thiếu thông tin");
         return;
     }
 
@@ -56,11 +118,11 @@ async function handleCreateSession(e) {
     }
 
     if (totalRate !== 100) {
-        alert("Tổng tỷ lệ phải bằng 100%. Hiện tại = " + totalRate);
+        alert("Tổng tỷ lệ phải = 100%. Hiện tại: " + totalRate);
         return;
     }
 
-    // Insert session
+    /* Insert session */
     const { data: sessionData, error: sessionError } =
         await supabaseClient
             .from('lixi_sessions')
@@ -69,15 +131,16 @@ async function handleCreateSession(e) {
             .single();
 
     if (sessionError) {
-        alert("Lỗi tạo session");
+        console.error(sessionError);
+        alert(sessionError.message);
         return;
     }
 
-    const sessionId = sessionData.id;
+    selectedSession = sessionData;
 
-    // Insert prizes
+    /* Insert prizes */
     const prizeRows = parsedPrizes.map(p => ({
-        session_id: sessionId,
+        session_id: sessionData.id,
         prize_name: p.prize_name,
         rate: p.rate
     }));
@@ -88,7 +151,8 @@ async function handleCreateSession(e) {
             .insert(prizeRows);
 
     if (prizeError) {
-        alert("Lỗi lưu phần thưởng");
+        console.error(prizeError);
+        alert(prizeError.message);
         return;
     }
 
@@ -98,13 +162,15 @@ async function handleCreateSession(e) {
 
 /* ================= LOAD PRIZES ================= */
 
-async function loadPrizes(sessionId) {
+async function loadPrizes() {
+
     const { data, error } = await supabaseClient
         .from('lixi_prizes')
         .select('*')
-        .eq('session_id', sessionId);
+        .eq('session_id', selectedSession.id);
 
     if (error) {
+        console.error(error);
         alert("Lỗi load prize");
         return;
     }
@@ -130,36 +196,48 @@ function getWeightedPrize(prizes) {
 
 /* ================= SPIN ================= */
 
-async function handleSpin(name, account) {
+async function handleSpin() {
+
     if (!selectedSession) {
-        alert("Chọn chương trình trước");
+        alert("Chưa tạo session");
         return;
     }
 
-    await loadPrizes(selectedSession.id);
+    const name = document.getElementById("playerName").value;
+    const account = document.getElementById("playerAccount").value;
 
-    if (!currentPrizes || currentPrizes.length === 0) {
-        alert("Chưa cấu hình prize");
+    if (!name) {
+        alert("Nhập tên người chơi");
+        return;
+    }
+
+    await loadPrizes();
+
+    if (!currentPrizes.length) {
+        alert("Chưa có prize");
         return;
     }
 
     const prize = getWeightedPrize(currentPrizes);
 
-    // Save winner
     const { error } = await supabaseClient
         .from('lixi_winners')
         .insert([{
             session_id: selectedSession.id,
-            name: name,
-            account: account,
-            prize: prize
+            name,
+            account,
+            prize
         }]);
 
     if (error) {
+        console.error(error);
         alert("Lỗi lưu kết quả");
         return;
     }
 
-    alert("Chúc mừng! Bạn trúng: " + prize);
+    alert("🎉 Bạn trúng: " + prize);
 }
 </script>
+
+</body>
+</html>
