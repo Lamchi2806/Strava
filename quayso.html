@@ -872,75 +872,120 @@
         }
 
         async function handleCreateSession(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const name = formData.get('name').trim();
-            
-            if (!name) { alert("Vui lòng nhập tên đợt lì xì!"); return; }
-            if (prizes.length === 0) { alert("Vui lòng nhập ít nhất một giải thưởng!"); return; }
+    e.preventDefault();
 
-            showLoading();
-            const { data: existingSessions, error: checkError } = await supabaseClient
-                .from('lixi_sessions').select('id').ilike('name', name); 
-            hideLoading();
+    const formData = new FormData(e.target);
+    const name = formData.get('name')?.trim();
+    const description = formData.get('description');
+    const pin = formData.get('pin');
+    const prizeInput = (formData.get('prizes') || "").trim();
 
-            if (checkError || (existingSessions && existingSessions.length > 0)) {
-                alert("Lỗi hoặc tên đợt lì xì đã tồn tại!"); return;
-            }
+    if (!name) {
+        alert("Vui lòng nhập tên đợt lì xì!");
+        return;
+    }
 
-            const success = await insertSessionToSupabase({
-                name: name,
-                pin: formData.get('pin'),
-                description: formData.get('description'),
-                prizes: prizes
-            });
-            
-            if (success) {
-                e.target.reset();
-                closeModal('createSessionModal');
-                loadOrganizerData(); 
-            } else {
-                alert("Lỗi khi tạo đợt lì xì.");
-            }
+    if (!prizeInput) {
+        alert("Vui lòng nhập danh sách phần thưởng!");
+        return;
+    }
+
+    // Check duplicate session name
+    showLoading();
+    const { data: existingSessions, error: checkError } =
+        await supabaseClient
+            .from('lixi_sessions')
+            .select('id')
+            .ilike('name', name);
+    hideLoading();
+
+    if (checkError) {
+        alert("Lỗi kiểm tra tên chương trình");
+        return;
+    }
+
+    if (existingSessions.length > 0) {
+        alert("Tên đợt lì xì đã tồn tại!");
+        return;
+    }
+
+    /* ===== Parse prizes ===== */
+
+    const lines = prizeInput.split('\n').filter(l => l.trim() !== '');
+    let totalRate = 0;
+    const parsedPrizes = [];
+
+    for (let line of lines) {
+        const parts = line.split(',');
+
+        if (parts.length !== 2) {
+            alert("Sai format (Tên,Rate): " + line);
+            return;
         }
 
-        function renderSessionCards(sessions) {
-            const container = document.getElementById('session-list');
-            const emptyMsg = document.getElementById('empty-session-msg');
-            container.innerHTML = '';
-            if (sessions.length === 0) { emptyMsg.classList.remove('hidden'); return; }
-            emptyMsg.classList.add('hidden');
+        const prizeName = parts[0].trim();
+        const rate = parseFloat(parts[1]);
 
-            sessions.forEach(s => {
-                const date = new Date(s.createdAt).toLocaleString('vi-VN');
-                const playerCount = s.winners.length;
-                let totalMoney = 0;
-                s.winners.forEach(w => {
-                    const num = parseInt(w.prize.replace(/\D/g, '')) || 0;
-                    totalMoney += num;
-                });
-
-                const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-xl border border-gray-100 hover:shadow-lg transition-shadow";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <h3 class="font-bold text-base md:text-lg text-gray-800">${s.name}</h3>
-                        <span class="bg-gray-100 text-[10px] md:text-xs font-semibold px-2 py-1 rounded text-gray-500">${date}</span>
-                    </div>
-                    <p class="text-xs md:text-sm text-gray-500 mb-4 line-clamp-2 h-8 md:h-10">${s.description || 'Không có mô tả'}</p>
-                    <div class="flex justify-between items-center text-xs md:text-sm mb-5 bg-gray-50 p-3 rounded-lg">
-                        <div class="flex items-center gap-1 font-semibold text-gray-700"><i class="fas fa-users text-blue-500"></i> ${playerCount}</div>
-                        <div class="flex items-center gap-1 font-bold text-yellow-600"><i class="fas fa-coins text-yellow-500"></i> ${totalMoney.toLocaleString('vi-VN')} đ</div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="requestAction('viewStats', '${s.id}')" class="flex-1 py-2.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-bold text-xs md:text-sm transition-colors"><i class="fas fa-chart-bar mr-1"></i> Thống kê</button>
-                        <button onclick="requestAction('edit', '${s.id}')" class="px-3 py-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors border border-orange-200"><i class="fas fa-edit"></i></button>
-                         <button onclick="requestAction('delete', '${s.id}')" class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-red-200"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+        if (!prizeName || isNaN(rate) || rate <= 0) {
+            alert("Dữ liệu không hợp lệ: " + line);
+            return;
         }
+
+        totalRate += rate;
+
+        parsedPrizes.push({
+            prize_name: prizeName,
+            rate: rate
+        });
+    }
+
+    // Fix float error
+    if (Math.round(totalRate * 100) / 100 !== 100) {
+        alert("Tổng tỷ lệ phải bằng 100%. Hiện tại = " + totalRate);
+        return;
+    }
+
+    /* ===== Insert session ===== */
+
+    const { data: sessionData, error: sessionError } =
+        await supabaseClient
+            .from('lixi_sessions')
+            .insert([{ name, description, pin }])
+            .select()
+            .single();
+
+    if (sessionError) {
+        alert("Lỗi tạo đợt lì xì: " + sessionError.message);
+        return;
+    }
+
+    const sessionId = sessionData.id;
+
+    /* ===== Insert prizes ===== */
+
+    const prizeRows = parsedPrizes.map(p => ({
+        session_id: sessionId,
+        prize_name: p.prize_name,
+        rate: p.rate
+    }));
+
+    const { error: prizeError } =
+        await supabaseClient
+            .from('lixi_prizes')
+            .insert(prizeRows);
+
+    if (prizeError) {
+        alert("Lỗi lưu phần thưởng: " + prizeError.message);
+        return;
+    }
+
+    alert("Tạo thành công!");
+
+    e.target.reset();
+    closeModal('createSessionModal');
+    loadOrganizerData();
+}
+
 
         // --- AUTH & EDIT/DELETE LOGIC ---
         function requestAction(action, sessionId) {
