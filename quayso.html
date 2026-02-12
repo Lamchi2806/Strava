@@ -225,11 +225,11 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="playerExtraFields" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="col-span-1">
                         <label class="block text-sm font-bold text-gray-700 mb-1">Họ và Tên</label>
                         <div class="relative">
-                            <input type="text" id="loginName" class="w-full p-3 pl-10 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm md:text-base" placeholder="VD: Nguyen Van A" required>
+                            <input type="text" id="loginName" class="w-full p-3 pl-10 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm md:text-base" placeholder="VD: Nguyen Van A">
                             <i class="fas fa-user absolute left-3 top-3.5 text-gray-400"></i>
                         </div>
                     </div>
@@ -246,7 +246,7 @@
                     <div class="col-span-1">
                         <label class="block text-sm font-bold text-gray-700 mb-1">Số tài khoản</label>
                         <div class="relative">
-                            <input type="text" id="loginAccount" class="w-full p-3 pl-10 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm md:text-base" placeholder="Nhập STK" required>
+                            <input type="text" id="loginAccount" class="w-full p-3 pl-10 border border-gray-300 rounded-xl outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm md:text-base" placeholder="Nhập STK">
                             <i class="fas fa-credit-card absolute left-3 top-3.5 text-gray-400"></i>
                         </div>
                     </div>
@@ -362,7 +362,7 @@
                         <textarea name="description" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm" rows="2" placeholder="Nhập nội dung hiển thị cho người chơi..."></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Danh sách giải thưởng</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Danh sách giải thưởng (Tên,Rate %)</label>
                         <textarea name="prizes" id="sessionPrizeInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none font-mono text-xs md:text-sm" rows="6"></textarea>
                         <p class="text-[10px] md:text-xs text-gray-500 mt-1">Gợi ý: Nhập đúng "500.000 VND" để hiện ảnh tiền.</p>
                     </div>
@@ -401,8 +401,12 @@
                         <textarea id="editDescription" name="description" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" rows="2"></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Danh sách giải thưởng</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Danh sách giải thưởng (Tên,Rate %)</label>
                         <textarea id="editPrizes" name="prizes" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-xs md:text-sm" rows="6"></textarea>
+                        <div class="mt-2 text-[10px] md:text-xs text-gray-500 space-y-1">
+  <div>✓ Mỗi dòng theo format: <span class="font-mono">Tên,Rate</span> (Rate là %). Tổng tất cả Rate phải bằng <b>100</b>.</div>
+  <div>✓ Gợi ý: Nhập đúng <span class="font-mono">"500.000 VND"</span> để hiện ảnh tiền.</div>
+</div>
                     </div>
                 </div>
                 <div class="flex justify-end gap-3 mt-4 pt-4 border-t shrink-0">
@@ -597,7 +601,7 @@
                     <div id="winnerImageContainer" class="mb-6 md:mb-8 flex justify-center h-32 md:h-40">
                          <img id="winnerImage" src="" class="h-full shadow-xl rounded-lg object-contain border-4 border-yellow-100 transform hover:scale-105 transition-transform duration-300">
                     </div>
-                    <button onclick="showWinnerActions()" class="w-full py-3 md:py-4 bg-red-600 text-white font-bold text-base md:text-lg rounded-xl hover:bg-red-700 shadow-xl shadow-red-200 transition-all transform hover:-translate-y-1">
+                    <button id="winnerPrimaryBtn" onclick="winnerPrimaryClick()" class="w-full py-3 md:py-4 bg-red-600 text-white font-bold text-base md:text-lg rounded-xl hover:bg-red-700 shadow-xl shadow-red-200 transition-all transform hover:-translate-y-1">
                         NHẬN QUÀ NGAY
                     </button>
                 </div>
@@ -655,7 +659,7 @@
 
                 <div class="p-4 bg-gray-50 border-t shrink-0">
                     <button onclick="finishGameAndExit()" class="w-full py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 shadow transition-all">
-                        Hoàn tất & Thoát
+                        Quay tiếp
                     </button>
                 </div>
             </div>
@@ -665,8 +669,11 @@
     <!-- Javascript Logic -->
     <script>
         // --- SUPABASE CONFIG ---
-        const supabaseUrl = 'https://rmbsxccrwrktbjlnezpu.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtYnN4Y2Nyd3JrdGJqbG5lenB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2MjczNjQsImV4cCI6MjA2NDIwMzM2NH0.ydCqificftdtn1niRciFCifeuo8aX6SDGti-hCY5Z_Y';
+        // const supabaseUrl = 'https://rmbsxccrwrktbjlnezpu.supabase.co';
+        // const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtYnN4Y2Nyd3JrdGJqbG5lenB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2MjczNjQsImV4cCI6MjA2NDIwMzM2NH0.ydCqificftdtn1niRciFCifeuo8aX6SDGti-hCY5Z_Y';
+
+        const supabaseUrl = 'https://nqxlwaitqcjurjuvurlr.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xeGx3YWl0cWNqdXJqdXZ1cmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3ODY1NjIsImV4cCI6MjA4NjM2MjU2Mn0.OBgHJu8o0P5TxA9y5St0kRxioAk4X551ntRIEw-HeWk';
         // Changed variable name to avoid conflict
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
@@ -681,6 +688,110 @@
         const defaultMoneyList = ["Nụ hôn", "5.000 VND", "10.000 VND", "20.000 VND", "Rượu", "50.000 VND", "100.000 VND", "200.000 VND", "500.000 VND"];
         const defaultNameList = ['Lan', 'Hoa', 'Tuan', 'Hung', 'Mai', 'Linh', 'Dat', 'Cuong'];
         const segmentColors = ["#e53935", "#fb8c00", "#fdd835", "#43a047", "#1e88e5", "#8e24aa", "#ffb74d", "#ef5350"];
+
+        // --- PRIZE (NAME,RATE) HELPERS ---
+        function buildPrizeLinesWithRates(labels) {
+            const n = labels.length;
+            if (n === 0) return [];
+            // 2 decimals, last item gets the remainder so total = 100.00
+            const base = Math.floor((100 / n) * 100) / 100; // e.g. 11.11 when n=9
+            const lines = [];
+            let sum = 0;
+            for (let i = 0; i < n; i++) {
+                const rate = (i === n - 1) ? Math.round((100 - sum) * 100) / 100 : base;
+                sum = Math.round((sum + rate) * 100) / 100;
+                lines.push(`${labels[i]},${rate.toFixed(2)}`);
+            }
+            return lines;
+        }
+
+        function parsePrizesFromLines(lines) {
+            const errors = [];
+            const items = [];
+            let total = 0;
+
+            for (let idx = 0; idx < lines.length; idx++) {
+                const raw = (lines[idx] || "").trim();
+                if (!raw) continue;
+
+                const commaPos = raw.lastIndexOf(',');
+                if (commaPos < 0) {
+                    errors.push(`Dòng ${idx + 1}: Thiếu dấu phẩy. Format đúng: Tên,Rate`);
+                    continue;
+                }
+
+                const label = raw.slice(0, commaPos).trim();
+                let rateStr = raw.slice(commaPos + 1).trim();
+                rateStr = rateStr.replace('%', '').trim();
+
+                const rate = Number.parseFloat(rateStr);
+                if (!label) {
+                    errors.push(`Dòng ${idx + 1}: Tên giải thưởng bị trống`);
+                    continue;
+                }
+                if (!Number.isFinite(rate) || rate <= 0) {
+                    errors.push(`Dòng ${idx + 1}: Rate không hợp lệ`);
+                    continue;
+                }
+
+                total += rate;
+                items.push({ label, rate });
+            }
+
+            total = Math.round(total * 100) / 100;
+            return { items, total, errors };
+        }
+
+        function validatePrizeRatesOrAlert(lines) {
+            const parsed = parsePrizesFromLines(lines);
+            if (parsed.errors.length) {
+                alert("Danh sách giải thưởng đang lỗi:\n" + parsed.errors.slice(0, 8).join("\n") + (parsed.errors.length > 8 ? "\n..." : ""));
+                return null;
+            }
+            const tolerance = 0.01;
+            if (Math.abs(parsed.total - 100) > tolerance) {
+                alert(`Tổng Rate phải bằng 100. Hiện tại = ${parsed.total}`);
+                return null;
+            }
+            return parsed.items;
+        }
+
+        // For session mode: keep weighted prizes here (null for instant mode)
+        let currentWheelPrizeObjects = null;
+
+        function buildSegmentsFromPrizes(prizes) {
+            const total = prizes.reduce((s, p) => s + p.rate, 0);
+            const segments = [];
+            let acc = 0;
+            for (let i = 0; i < prizes.length; i++) {
+                const span = (prizes[i].rate / total) * Math.PI * 2;
+                const start = acc;
+                const end = acc + span;
+                segments.push({ start, end, label: prizes[i].label, rate: prizes[i].rate });
+                acc = end;
+            }
+            if (segments.length) segments[segments.length - 1].end = Math.PI * 2;
+            return segments;
+        }
+
+        function normalizeAngle(rad) {
+            const two = Math.PI * 2;
+            let x = rad % two;
+            if (x < 0) x += two;
+            return x;
+        }
+
+        // pointer is at angle 0 (right side)
+        function getSegmentIndexFromRotation(rotation, segments) {
+            const two = Math.PI * 2;
+            const rot = normalizeAngle(rotation);
+            const pointerAngle = normalizeAngle(two - rot);
+            for (let i = 0; i < segments.length; i++) {
+                const s = segments[i];
+                if (pointerAngle >= s.start && pointerAngle < s.end) return i;
+            }
+            return segments.length - 1;
+        }
 
         // --- VIETQR CONFIG ---
         const VIETQR_BANKS_API = 'https://api.vietqr.io/v2/banks';
@@ -799,23 +910,118 @@
 
         async function insertSessionToSupabase(session) {
             showLoading();
-            const { error } = await supabaseClient.from('lixi_sessions').insert({
-                name: session.name,
-                pin: session.pin, // Player PIN
-                admin_pin: session.admin_pin, // Admin PIN
-                description: session.description,
-                prizes: session.prizes
-            });
+            const { data, error } = await supabaseClient
+                .from('lixi_sessions')
+                .insert({
+                    name: session.name,
+                    pin: session.pin, // Player PIN
+                    admin_pin: session.admin_pin, // Admin PIN
+                    description: session.description,
+                    // Chỉ lưu tên giải ở sessions; tỉ lệ lưu ở bảng lixi_prizers
+                    prizes: session.prizes
+                })
+                .select('id')
+                .single();
             hideLoading();
-            return !error;
+            if (error) {
+                console.error('Error insert session:', error);
+                return null;
+            }
+            return data?.id || null;
         }
 
         async function updateSessionInSupabase(id, data) {
             showLoading();
             const { error } = await supabaseClient.from('lixi_sessions').update(data).eq('id', id);
             hideLoading();
-            return !error;
+            if (error) {
+                console.error('Error update session:', error);
+                return false;
+            }
+            return true;
         }
+
+        // --- PRIZERS (RATE) STORE ---
+        // Bảng: lixi_prizers(id, session_id(FK), prize_name, rate, rate_created_at)
+        // - session_id: khóa phụ trỏ tới lixi_sessions.id
+        // - rate: tỉ lệ % (0..100)
+        // - rate_created_at: thời điểm set tỉ lệ (có thể default now() trong DB)
+
+        async function replacePrizersInSupabase(sessionId, prizeObjs) {
+            if (!sessionId) return false;
+
+            // prizeObjs: [{label, rate}]
+            const rows = prizeObjs.map(p => ({
+                session_id: sessionId,
+                prize_name: p.label,
+                rate: p.rate,
+                created_at: new Date().toISOString()
+            }));
+
+            showLoading();
+            // Replace strategy: xóa hết rồi insert lại để đúng 100%
+            const { error: delErr } = await supabaseClient
+                .from('lixi_prizes')
+                .delete()
+                .eq('session_id', sessionId);
+
+            if (delErr) {
+                hideLoading();
+                console.error('Error delete prizers:', delErr);
+                return false;
+            }
+
+            const { error: insErr } = await supabaseClient
+                .from('lixi_prizes')
+                .insert(rows);
+            hideLoading();
+
+            if (insErr) {
+                console.error('Error insert prizers:', insErr);
+                return false;
+            }
+            return true;
+        }
+
+        async function fetchPrizersFromSupabase(sessionId) {
+            if (!sessionId) return [];
+            const { data, error } = await supabaseClient
+                .from('lixi_prizes')
+                .select('id, prize_name, rate, created_at')
+                .eq('session_id', sessionId)
+                .order('id', { ascending: true });
+
+            if (error) {
+                console.error('Error fetch prizers:', error);
+                return [];
+            }
+
+            return (data || []).map(r => ({
+                label: r.prize_name,
+                rate: typeof r.rate === 'number' ? r.rate : Number(r.rate)
+            }));
+        }
+
+        function validatePrizeObjectsOrAlert(prizeObjs) {
+            if (!Array.isArray(prizeObjs) || prizeObjs.length === 0) {
+                alert('Chưa có danh sách giải thưởng / tỉ lệ!');
+                return false;
+            }
+            const sum = prizeObjs.reduce((a, p) => a + (Number(p.rate) || 0), 0);
+            if (Math.abs(sum - 100) > 0.01) {
+                alert(`Tổng Rate phải bằng 100. Hiện tại = ${sum.toFixed(2)}`);
+                return false;
+            }
+            for (const p of prizeObjs) {
+                const r = Number(p.rate);
+                if (!Number.isFinite(r) || r <= 0) {
+                    alert(`Rate không hợp lệ cho giải: "${p.label}" (Rate=${p.rate})`);
+                    return false;
+                }
+            }
+            return true;
+        }
+
 
         async function insertWinnerToSupabase(sessionId, winner) {
             // winner.account should be "BANK::ACCOUNT"
@@ -848,7 +1054,9 @@
 
         async function deleteSessionFromSupabase(id) {
             showLoading();
+            // Xóa winners + prizers trước, rồi mới xóa session
             await supabaseClient.from('lixi_winners').delete().eq('session_id', id);
+            await supabaseClient.from('lixi_prizes').delete().eq('session_id', id);
             const { error } = await supabaseClient.from('lixi_sessions').delete().eq('id', id);
             hideLoading();
             return !error;
@@ -874,6 +1082,9 @@
         let authPendingAction = null; 
         let authTargetId = null;
         let currentWinnerPrize = null; // Store for sharing
+        let sessionSpinCounter = 0;
+        let sessionMultiSpin = false; // session mode: allow spinning many times without entering name/account
+
 
         // --- VIEW NAVIGATION ---
         function showView(viewId) {
@@ -908,28 +1119,32 @@
 
         function openCreateSessionModal() {
             document.getElementById('createSessionModal').classList.add('active');
-            document.getElementById('sessionPrizeInput').value = defaultMoneyList.join('\n');
+            document.getElementById('sessionPrizeInput').value = buildPrizeLinesWithRates(defaultMoneyList).join('\n');
         }
 
         async function handleCreateSession(e) {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const name = formData.get('name').trim();
-            const pin = formData.get('pin').trim(); // User PIN
-            const adminPin = formData.get('admin_pin').trim(); // Admin PIN
-            const prizes = (formData.get('prizes') || "").split('\n').filter(n => n.trim() !== '');
+            const name = (formData.get('name') || '').trim();
+            const pin = (formData.get('pin') || '').trim(); // User PIN
+            const adminPin = (formData.get('admin_pin') || '').trim(); // Admin PIN
+
+            const prizeLines = (formData.get('prizes') || "").split('\n').map(s => s.trim()).filter(Boolean);
+            const prizeObjs = validatePrizeRatesOrAlert(prizeLines);
+            if (!prizeObjs) return;
 
             if (!name) { alert("Vui lòng nhập tên đợt lì xì!"); return; }
             if (!adminPin) { alert("Vui lòng nhập PIN Quản lý!"); return; }
             if (!pin) { alert("Vui lòng nhập PIN Người chơi!"); return; }
             if (adminPin === pin) { alert("Mã PIN Quản lý và Người chơi không được trùng nhau!"); return; }
-            if (prizes.length === 0) { alert("Vui lòng nhập ít nhất một giải thưởng!"); return; }
+            if (prizeLines.length === 0) { alert("Vui lòng nhập ít nhất một giải thưởng!"); return; }
 
+            // KIỂM TRA TRÙNG TÊN
             showLoading();
             const { data: existingSessions, error: checkError } = await supabaseClient
                 .from('lixi_sessions')
                 .select('id')
-                .ilike('name', name); 
+                .ilike('name', name);
             hideLoading();
 
             if (checkError) {
@@ -943,21 +1158,29 @@
                 return;
             }
 
-            const success = await insertSessionToSupabase({
+            // 1) Insert session (chỉ lưu tên giải)
+            const newSessionId = await insertSessionToSupabase({
                 name: name,
                 pin: pin,
                 admin_pin: adminPin,
                 description: formData.get('description'),
-                prizes: prizes
+                prizes: prizeObjs.map(p => p.label)
             });
-            
-            if (success) {
-                e.target.reset();
-                closeModal('createSessionModal');
-                loadOrganizerData(); 
-            } else {
+
+            if (!newSessionId) {
                 alert("Lỗi khi tạo đợt lì xì. Vui lòng thử lại.");
+                return;
             }
+
+            // 2) Lưu tỉ lệ vào bảng lixi_prizers
+            const okRate = await replacePrizersInSupabase(newSessionId, prizeObjs);
+            if (!okRate) {
+                alert("Đã tạo đợt nhưng lưu tỉ lệ giải thưởng thất bại. Vui lòng vào Sửa để cập nhật lại.");
+            }
+
+            e.target.reset();
+            closeModal('createSessionModal');
+            loadOrganizerData();
         }
 
         function renderSessionCards(sessions) {
@@ -1043,7 +1266,7 @@
             loadOrganizerData(); // Refresh list
         }
 
-        function openEditModal(sessionId) {
+        async function openEditModal(sessionId) {
             const session = cachedSessions.find(s => s.id === sessionId);
             if(!session) return;
 
@@ -1052,8 +1275,17 @@
             document.getElementById('editPin').value = session.pin || ''; // Player PIN
             document.getElementById('editAdminPin').value = session.admin_pin || ''; // Admin PIN
             document.getElementById('editDescription').value = session.description || '';
-            document.getElementById('editPrizes').value = session.prizes.join('\n');
-            
+
+            // Ưu tiên load từ bảng lixi_prizers
+            const prizers = await fetchPrizersFromSupabase(session.id);
+            if (prizers && prizers.length) {
+                document.getElementById('editPrizes').value = prizers.map(p => `${p.label},${Number(p.rate).toFixed(2)}`).join('\n');
+            } else {
+                // Fallback: dữ liệu cũ lưu trong lixi_sessions.prizes
+                const fallbackLines = (session.prizes || []).map(x => String(x));
+                document.getElementById('editPrizes').value = fallbackLines.join('\n');
+            }
+
             document.getElementById('editSessionModal').classList.add('active');
         }
 
@@ -1061,13 +1293,16 @@
             e.preventDefault();
             const formData = new FormData(e.target);
             const id = formData.get('id');
-            const name = formData.get('name').trim();
-            const adminPin = formData.get('admin_pin').trim();
-            const pin = formData.get('pin').trim();
-            const prizes = (formData.get('prizes') || "").split('\n').filter(n => n.trim() !== '');
+            const name = (formData.get('name') || '').trim();
+            const adminPin = (formData.get('admin_pin') || '').trim();
+            const pin = (formData.get('pin') || '').trim();
+
+            const prizeLines = (formData.get('prizes') || "").split('\n').map(s => s.trim()).filter(Boolean);
+            const prizeObjs = validatePrizeRatesOrAlert(prizeLines);
+            if (!prizeObjs) return;
 
             if (!name) { alert("Vui lòng nhập tên đợt lì xì!"); return; }
-            if (prizes.length === 0) { alert("Vui lòng nhập ít nhất một giải thưởng!"); return; }
+            if (prizeLines.length === 0) { alert("Vui lòng nhập ít nhất một giải thưởng!"); return; }
             if (adminPin === pin) { alert("Mã PIN Quản lý và Người chơi không được trùng nhau!"); return; }
 
             // KIỂM TRA TRÙNG TÊN
@@ -1076,7 +1311,7 @@
                 .from('lixi_sessions')
                 .select('id')
                 .ilike('name', name)
-                .neq('id', id); 
+                .neq('id', id);
             hideLoading();
 
             if (checkError) {
@@ -1090,20 +1325,28 @@
                 return;
             }
 
+            // 1) Update session (chỉ lưu tên giải)
             const success = await updateSessionInSupabase(id, {
                 name: name,
                 pin: pin,
                 admin_pin: adminPin,
                 description: formData.get('description'),
-                prizes: prizes
+                prizes: prizeObjs.map(p => p.label)
             });
 
-            if (success) {
-                closeModal('editSessionModal');
-                loadOrganizerData(); 
-            } else {
+            if (!success) {
                 alert("Cập nhật thất bại!");
+                return;
             }
+
+            // 2) Update prizers rate
+            const okRate = await replacePrizersInSupabase(id, prizeObjs);
+            if (!okRate) {
+                alert("Cập nhật đợt thành công nhưng lưu tỉ lệ giải thưởng thất bại.");
+            }
+
+            closeModal('editSessionModal');
+            loadOrganizerData();
         }
 
         // --- STATS & QR LOGIC ---
@@ -1267,25 +1510,32 @@
             e.preventDefault();
             const sessionId = document.getElementById('loginSessionId').value;
             const pin = document.getElementById('loginPin').value;
-            const name = document.getElementById('loginName').value.trim();
-            const bank = document.getElementById('loginBank').value;
-            const accountNo = document.getElementById('loginAccount').value.trim();
 
-            if (!sessionId || !bank || !accountNo) { alert("Vui lòng điền đủ thông tin!"); return; }
-            
+            if (!sessionId) { alert("Vui lòng chọn đợt lì xì!"); return; }
+
             const session = cachedSessions.find(s => s.id === sessionId);
             if (!session) { alert("Đợt lì xì không hợp lệ"); return; }
             if (session.pin && session.pin !== pin) { alert("Mã PIN không chính xác!"); return; }
-            
-            const played = await checkHasPlayed(sessionId, accountNo);
-            if (played) { alert(`TK ${accountNo} đã tham gia quay số trong đợt này rồi. Mỗi người chỉ được quay 1 lần!`); return; }
 
+            // SESSION MULTI-SPIN MODE:
+            // Không yêu cầu nhập Họ tên / Ngân hàng / STK, cho phép quay nhiều lần liên tục.
             currentSession = session;
-            const combinedAccount = `${bank}::${accountNo}`;
-            currentPlayer = { name, account: combinedAccount, displayAccount: `${bank} - ${accountNo}`, bankCode: bank, accountNo: accountNo };
-            
-            currentWheelItems = (session.prizes && session.prizes.length > 0) ? session.prizes : [...defaultMoneyList];
-            isMoneyMode = true; 
+            sessionMultiSpin = true;
+            sessionSpinCounter = 0;
+
+            currentPlayer = {
+                name: "Quay nhiều lần",
+                account: "ANON::0",
+                displayAccount: "Không cần nhập thông tin"
+            };
+
+            // Load prizers + rate từ bảng lixi_prizers
+            const prizers = await fetchPrizersFromSupabase(session.id);
+            if (!validatePrizeObjectsOrAlert(prizers)) return;
+
+            currentWheelPrizeObjects = prizers;
+            currentWheelItems = prizers.map(p => p.label);
+            isMoneyMode = true;
             startGame();
         }
 
@@ -1293,6 +1543,7 @@
             currentSession = { id: null, name: "Khách - Chơi Tự Do" };
             currentPlayer = { name: "Khách", account: "Vui chơi", displayAccount: "Không lưu" };
             isMoneyMode = true; 
+            currentWheelPrizeObjects = null;
             currentWheelItems = [...customMoneyList];
             startGame();
         }
@@ -1318,6 +1569,7 @@
 
         function toggleInstantMode() {
             isMoneyMode = !isMoneyMode;
+            currentWheelPrizeObjects = null;
             if (isMoneyMode) { currentWheelItems = [...customMoneyList]; } 
             else { currentWheelItems = [...customNameList]; }
             updateGameUI();
@@ -1327,6 +1579,7 @@
         document.getElementById('instantInput').addEventListener('input', (e) => {
             const val = e.target.value;
             const list = val.split('\n').filter(n => n.trim() !== '');
+            currentWheelPrizeObjects = null;
             currentWheelItems = list;
             if (isMoneyMode) { customMoneyList = list; } else { customNameList = list; }
             document.getElementById('nameCount').innerText = `${list.length} mục`;
@@ -1341,12 +1594,19 @@
             document.getElementById('displayPlayerAcc').innerText = currentPlayer.displayAccount || currentPlayer.account;
             
             if (currentSession.id === null) {
+                // Instant play (không lưu, có thể chỉnh danh sách)
                 document.getElementById('gamePlayerInfo').classList.add('hidden');
                 document.getElementById('instantControls').classList.remove('hidden');
                 document.getElementById('instantControls').classList.add('flex');
                 document.getElementById('prizeListContainer').classList.add('hidden');
             } else {
-                document.getElementById('gamePlayerInfo').classList.remove('hidden');
+                // Session play (giải thưởng đã khai báo)
+                if (sessionMultiSpin) {
+                    // Không cần hiển thị info người nhận
+                    document.getElementById('gamePlayerInfo').classList.add('hidden');
+                } else {
+                    document.getElementById('gamePlayerInfo').classList.remove('hidden');
+                }
                 document.getElementById('instantControls').classList.add('hidden');
                 document.getElementById('instantControls').classList.remove('flex');
                 document.getElementById('prizeListContainer').classList.remove('hidden');
@@ -1366,10 +1626,13 @@
 
             if (currentSession.id) {
                 prizeListDisplay.innerHTML = '';
-                currentWheelItems.forEach(m => {
+                const list = currentWheelPrizeObjects ? currentWheelPrizeObjects : currentWheelItems.map(x => ({ label: x, rate: null }));
+                list.forEach(p => {
                     const li = document.createElement('li');
-                    li.className = "flex items-center gap-2 p-2 bg-gray-50 rounded border border-gray-100";
-                    li.innerHTML = `<i class="fas fa-gift text-green-500 mr-2"></i> <span class="font-bold text-gray-700">${m}</span>`;
+                    li.className = "flex items-center justify-between gap-2 p-2 bg-gray-50 rounded border border-gray-100";
+                    // const rateText = (p.rate != null) ? `<span class="text-[11px] font-bold text-gray-500">${p.rate.toFixed(2)}%</span>` : '';
+                    const rateText = '';
+                    li.innerHTML = `<div class="flex items-center gap-2"><i class="fas fa-gift text-green-500"></i><span class="font-bold text-gray-700">${p.label}</span></div>${rateText}`;
                     prizeListDisplay.appendChild(li);
                 });
                 return;
@@ -1399,138 +1662,268 @@
         }
         window.onresize = () => { if(document.getElementById('view-game').classList.contains('active')) { resizeCanvas(); drawWheel(); }};
 
-        function drawWheel() {
+function drawWheel() {
             const rect = canvas.getBoundingClientRect();
             if (rect.width === 0) return;
+
             const width = rect.width;
             const height = rect.height;
             const centerX = width / 2;
             const centerY = height / 2;
-            let radius = width / 2 - 10; 
+            let radius = width / 2 - 10;
             if (radius <= 0) return;
 
-            const items = currentWheelItems;
             ctx.clearRect(0, 0, width, height);
-            if (items.length === 0) return;
 
-            const step = (2 * Math.PI) / items.length;
+            const isSessionWeighted = !!(currentSession && currentSession.id && currentWheelPrizeObjects && currentWheelPrizeObjects.length);
+            const segments = isSessionWeighted ? buildSegmentsFromPrizes(currentWheelPrizeObjects) : null;
+
+            const items = currentWheelItems;
+            if (!items || items.length === 0) return;
+
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(currentRotation);
 
-            for (let i = 0; i < items.length; i++) {
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, i * step, (i + 1) * step);
-                ctx.closePath();
-                ctx.fillStyle = segmentColors[i % segmentColors.length];
-                ctx.fill();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = "#fff";
-                ctx.stroke();
+            if (!isSessionWeighted) {
+                const step = (2 * Math.PI) / items.length;
+                for (let i = 0; i < items.length; i++) {
+                    const start = i * step;
+                    const end = (i + 1) * step;
+                    const val = items[i];
 
-                ctx.save();
-                ctx.rotate(i * step + step / 2);
-                
-                const val = items[i];
-                if (loadedMoneyImages[val]) {
-                    const img = loadedMoneyImages[val];
-                    const aspectRatio = img.width / img.height;
-                    const drawHeight = radius * 0.35; 
-                    const drawWidth = drawHeight * aspectRatio;
-                    const startX = radius * 0.2;
-                    let finalWidth = drawWidth; let finalHeight = drawHeight;
-                    if (startX + finalWidth > radius - 10) { const scale = (radius - 10 - startX) / finalWidth; finalWidth *= scale; finalHeight *= scale; }
-                    ctx.drawImage(img, startX, -finalHeight/2, finalWidth, finalHeight);
-                } else {
-                    ctx.textAlign = "right";
-                    ctx.fillStyle = "#fff";
-                    const fontSize = Math.min(20 + 200/items.length, 28);
-                    ctx.font = `bold ${fontSize}px Montserrat, Arial`;
-                    ctx.shadowColor = "rgba(0,0,0,0.3)";
-                    ctx.shadowBlur = 2;
-                    ctx.fillText(val, radius - 20, 8);
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.arc(0, 0, radius, start, end);
+                    ctx.closePath();
+                    ctx.fillStyle = segmentColors[i % segmentColors.length];
+                    ctx.fill();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "#fff";
+                    ctx.stroke();
+
+                    ctx.save();
+                    ctx.rotate(start + (end - start) / 2);
+
+                    if (loadedMoneyImages[val]) {
+                        const img = loadedMoneyImages[val];
+                        const aspectRatio = img.width / img.height;
+                        const drawHeight = radius * 0.35;
+                        const drawWidth = drawHeight * aspectRatio;
+                        const startX = radius * 0.2;
+
+                        let finalWidth = drawWidth;
+                        let finalHeight = drawHeight;
+                        if (startX + finalWidth > radius - 10) {
+                            const scale = (radius - 10 - startX) / finalWidth;
+                            finalWidth *= scale;
+                            finalHeight *= scale;
+                        }
+                        ctx.drawImage(img, startX, -finalHeight / 2, finalWidth, finalHeight);
+                    } else {
+                        ctx.textAlign = "right";
+                        ctx.fillStyle = "#fff";
+                        const fontSize = Math.min(20 + 200 / items.length, 28);
+                        ctx.font = `bold ${fontSize}px Montserrat, Arial`;
+                        ctx.shadowColor = "rgba(0,0,0,0.3)";
+                        ctx.shadowBlur = 2;
+                        ctx.fillText(val, radius - 20, 8);
+                    }
+
+                    ctx.restore();
                 }
-                ctx.restore();
+            } else {
+                for (let i = 0; i < segments.length; i++) {
+                    const seg = segments[i];
+                    const val = seg.label;
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.arc(0, 0, radius, seg.start, seg.end);
+                    ctx.closePath();
+                    ctx.fillStyle = segmentColors[i % segmentColors.length];
+                    ctx.fill();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "#fff";
+                    ctx.stroke();
+
+                    ctx.save();
+                    const mid = (seg.start + seg.end) / 2;
+                    ctx.rotate(mid);
+
+                    if (loadedMoneyImages[val]) {
+                        const img = loadedMoneyImages[val];
+                        const aspectRatio = img.width / img.height;
+                        const drawHeight = radius * 0.35;
+                        const drawWidth = drawHeight * aspectRatio;
+                        const startX = radius * 0.2;
+
+                        let finalWidth = drawWidth;
+                        let finalHeight = drawHeight;
+                        if (startX + finalWidth > radius - 10) {
+                            const scale = (radius - 10 - startX) / finalWidth;
+                            finalWidth *= scale;
+                            finalHeight *= scale;
+                        }
+                        ctx.drawImage(img, startX, -finalHeight / 2, finalWidth, finalHeight);
+                    } else {
+                        ctx.textAlign = "right";
+                        ctx.fillStyle = "#fff";
+                        const fontSize = Math.min(20 + 200 / items.length, 28);
+                        ctx.font = `bold ${fontSize}px Montserrat, Arial`;
+                        ctx.shadowColor = "rgba(0,0,0,0.3)";
+                        ctx.shadowBlur = 2;
+                        ctx.fillText(val, radius - 20, 8);
+                    }
+
+                    ctx.restore();
+                }
             }
+
             ctx.restore();
         }
 
         function startSpin() {
             if (isSpinning || currentWheelItems.length === 0) return;
-            isSpinning = true;
-            document.getElementById('spin-instruction').style.opacity = '0';
-            
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            function playTick() {
-                 const osc = audioCtx.createOscillator();
-                 const gain = audioCtx.createGain();
-                 osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                 gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-                 osc.connect(gain); gain.connect(audioCtx.destination);
-                 osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+
+            // If in session mode, enforce rate check right before spinning
+            if (currentSession && currentSession.id) {
+                if (!validatePrizeObjectsOrAlert(currentWheelPrizeObjects)) return;
             }
 
-            const duration = 7000; 
+            isSpinning = true;
+            document.getElementById('spin-instruction').style.opacity = '0';
+
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            function playTick() {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            }
+
+            const duration = 7000;
             const startTimestamp = performance.now();
-            const randomOffset = Math.random() * 2 * Math.PI;
-            const totalRotationNeeded = (15 * Math.PI * 2) + randomOffset; 
+            const randomOffset = Math.random() * 2 * Math.PI; // uniform -> weighted by segment size
+            const totalRotationNeeded = (15 * Math.PI * 2) + randomOffset;
             const startAngle = currentRotation;
-            let lastSegmentIndex = -1;
+
+            let lastIndex = -1;
+            const isSessionWeighted = !!(currentSession && currentSession.id && currentWheelPrizeObjects && currentWheelPrizeObjects.length);
+            const segments = isSessionWeighted ? buildSegmentsFromPrizes(currentWheelPrizeObjects) : null;
+            const step = (!isSessionWeighted) ? ((2 * Math.PI) / currentWheelItems.length) : null;
 
             function animate(timestamp) {
                 const elapsed = timestamp - startTimestamp;
                 const progress = Math.min(elapsed / duration, 1);
                 const ease = 1 - Math.pow(1 - progress, 3);
-                
-                const prevRotation = currentRotation;
+
                 currentRotation = startAngle + (totalRotationNeeded * ease);
 
-                const itemsCount = currentWheelItems.length;
-                const step = (2 * Math.PI) / itemsCount;
-                const normalizedRot = currentRotation % (2 * Math.PI);
-                const currentIndex = Math.floor((2 * Math.PI - normalizedRot) / step) % itemsCount;
-                
-                if (currentIndex !== lastSegmentIndex && progress < 1) { playTick(); lastSegmentIndex = currentIndex; }
+                let currentIndex = 0;
+                if (!isSessionWeighted) {
+                    const normalizedRot = normalizeAngle(currentRotation);
+                    currentIndex = Math.floor((2 * Math.PI - normalizedRot) / step) % currentWheelItems.length;
+                } else {
+                    currentIndex = getSegmentIndexFromRotation(currentRotation, segments);
+                }
+
+                if (currentIndex !== lastIndex && progress < 1) {
+                    playTick();
+                    lastIndex = currentIndex;
+                }
 
                 drawWheel();
 
-                if (progress < 1) { requestAnimationFrame(animate); } else { isSpinning = false; finishSpin(); }
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    isSpinning = false;
+                    finishSpin();
+                }
             }
             requestAnimationFrame(animate);
         }
 
         function finishSpin() {
             const items = currentWheelItems;
-            const step = (2 * Math.PI) / items.length;
-            const normalizedRotation = currentRotation % (2 * Math.PI);
-            let winningIndex = Math.floor(((2 * Math.PI) - normalizedRotation) / step) % items.length;
-            if (winningIndex < 0) winningIndex += items.length;
+
+            const isSessionWeighted = !!(currentSession && currentSession.id && currentWheelPrizeObjects && currentWheelPrizeObjects.length);
+            let winningIndex = 0;
+
+            if (!isSessionWeighted) {
+                const step = (2 * Math.PI) / items.length;
+                const normalizedRotation = normalizeAngle(currentRotation);
+                winningIndex = Math.floor(((2 * Math.PI) - normalizedRotation) / step) % items.length;
+                if (winningIndex < 0) winningIndex += items.length;
+            } else {
+                const segments = buildSegmentsFromPrizes(currentWheelPrizeObjects);
+                winningIndex = getSegmentIndexFromRotation(currentRotation, segments);
+            }
 
             const prize = items[winningIndex];
             currentWinnerPrize = prize;
-            
+
+            // Session mode: có thể quay nhiều lần (không cần thông tin người nhận)
             if (currentSession && currentSession.id) {
-                const winnerData = {
-                    name: currentPlayer.name,
-                    account: currentPlayer.account, // Stored as BANK::ACC
-                    prize: prize
-                };
-                insertWinnerToSupabase(currentSession.id, winnerData);
+                if (sessionMultiSpin) {
+                    sessionSpinCounter += 1;
+                    const winnerData = {
+                        name: `Lượt quay #${sessionSpinCounter}`,
+                        account: `ANON::${Date.now()}`,
+                        prize: prize
+                    };
+                    insertWinnerToSupabase(currentSession.id, winnerData);
+                } else {
+                    const winnerData = {
+                        name: currentPlayer.name,
+                        account: currentPlayer.account, // Stored as BANK::ACC
+                        prize: prize
+                    };
+                    insertWinnerToSupabase(currentSession.id, winnerData);
+                }
             }
 
             document.getElementById('winnerText').innerText = prize;
             document.getElementById('winSubtext').innerText = isMoneyMode ? "Lộc xuân đã về ví của bạn" : "Người chiến thắng là";
 
+            // Nút chính trong popup:
+            const primaryBtn = document.getElementById('winnerPrimaryBtn');
+            if (currentSession && currentSession.id) {
+                primaryBtn.innerText = "QUAY TIẾP";
+            } else {
+                primaryBtn.innerText = "NHẬN QUÀ NGAY";
+            }
+
             const imgContainer = document.getElementById('winnerImageContainer');
             if (isMoneyMode && loadedMoneyImages[prize]) {
                 document.getElementById('winnerImage').src = loadedMoneyImages[prize].src;
                 imgContainer.classList.remove('hidden');
-            } else { imgContainer.classList.add('hidden'); }
-            
+            } else {
+                imgContainer.classList.add('hidden');
+            }
+
+            // Reset winner modal steps mỗi lần mở
+            document.getElementById('winnerStep2').classList.add('hidden');
+            document.getElementById('winnerStep2').classList.remove('flex');
+            document.getElementById('winnerStep1').classList.remove('hidden');
+
             document.getElementById('winnerModal').classList.add('active');
             confetti({ particleCount: 200, spread: 120, origin: { y: 0.6 }, colors: ['#e53935', '#ffeb3b', '#43a047'] });
+        }
+
+        function winnerPrimaryClick() {
+            // Session mode: quay nhiều lần -> nút chính sẽ là "Quay tiếp"
+            if (currentSession && currentSession.id) {
+                finishGameAndExit();
+            } else {
+                showWinnerActions();
+            }
         }
 
         function showWinnerActions() {
@@ -1610,7 +2003,13 @@
 
         function finishGameAndExit() {
             document.getElementById('winnerModal').classList.remove('active');
-            if (currentSession && currentSession.id) { exitGame(); } else { document.getElementById('spin-instruction').style.opacity = '1'; }
+
+            // Reset về step 1 để lần sau mở lại popup đúng trạng thái
+            document.getElementById('winnerStep2').classList.add('hidden');
+            document.getElementById('winnerStep2').classList.remove('flex');
+            document.getElementById('winnerStep1').classList.remove('hidden');
+
+            document.getElementById('spin-instruction').style.opacity = '1';
         }
 
         function exitGame() {
