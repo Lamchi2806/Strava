@@ -139,10 +139,10 @@
                     THAM GIA QUAY SỐ
                 </button>
 
-                <button onclick="startInstantPlay()" class="group w-full py-3 bg-white border-2 border-green-500 text-green-600 rounded-xl font-bold hover:bg-green-50 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow text-sm md:text-base">
+                <!--button onclick="startInstantPlay()" class="group w-full py-3 bg-white border-2 border-green-500 text-green-600 rounded-xl font-bold hover:bg-green-50 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow text-sm md:text-base">
                     <i class="fas fa-rocket text-lg md:text-xl group-hover:-translate-y-0.5 transition-transform"></i>
                     CHƠI NGAY (KHÔNG CẦN ĐĂNG KÝ)
-                </button>
+                </button-->
 
                 <!-- Guide Button -->
                 <button onclick="openGuideModal()" class="w-full py-2 text-gray-500 hover:text-blue-600 font-semibold text-xs md:text-sm flex items-center justify-center gap-2 transition-colors">
@@ -550,7 +550,7 @@ Nụ hôn,10
                         <li><strong>Bước 4:</strong> Bấm xác nhận để vào màn hình quay. Chạm vào vòng quay để thử vận may.</li>
                     </ul>
                 </div>
-                <div>
+                <!--div>
                     <h4 class="flex items-center gap-2 font-bold text-lg text-green-700 mb-3">
                         <span class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-sm">3</span>
                         Chế độ Chơi Tự Do
@@ -560,7 +560,7 @@ Nụ hôn,10
                         <li>Bấm <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-bold">Chơi ngay</span>.</li>
                         <li>Bạn có thể tự do chỉnh sửa các ô trên vòng quay (nhập tên người hoặc mệnh giá tiền tùy thích).</li>
                     </ul>
-                </div>
+                </div-->
             </div>
             <div class="p-4 border-t bg-gray-50 flex justify-end">
                 <button onclick="closeModal('guideModal')" class="px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold shadow transition-colors">Đã Hiểu</button>
@@ -645,6 +645,10 @@ Nụ hôn,10
                 </div>
 
                 <div class="p-4 bg-gray-50 border-t shrink-0">
+                    <button onclick="rePlay()" class="w-full py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 shadow transition-all" style="margin-bottom: 10px;">
+                        Quay lại
+                    </button>
+                    
                     <button onclick="finishGameAndExit()" class="w-full py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 shadow transition-all">
                         Hoàn tất & Thoát
                     </button>
@@ -767,15 +771,17 @@ Nụ hôn,10
 
         async function fetchSessionsFromSupabase() {
             showLoading();
-            const { data, error } = await supabaseClient.from('lixi_sessions').select('*, lixi_winners(*)').order('created_at', { ascending: false });
+            const { data, error } = await supabaseClient.from('lixi_sessions').select('*, lixi_winners(*), lixi_prizes(*)').order('created_at', { ascending: false });
             hideLoading();
             if (error) { console.error(error); return []; }
-            return data.map(s => ({
+            
+            const rs = data.map(s => ({
                 id: s.id,
                 name: s.name,
                 pin: s.pin,
                 description: s.description,
-                prizes: s.prizes || [],
+                prizes: s.lixi_prizes.map(w => (w.prize_name)),
+                rates: s.lixi_prizes.map(w => (w.rate)),
                 createdAt: s.created_at,
                 winners: s.lixi_winners.map(w => ({
                     name: w.name,
@@ -784,6 +790,8 @@ Nụ hôn,10
                     time: w.created_at
                 }))
             }));
+            console.log(rs);
+            return rs;
         }
 
         async function insertSessionToSupabase(session) {
@@ -1528,6 +1536,10 @@ Nụ hôn,10
                     alert("Không có mã QR để tải!");
                 }
             }
+        }
+
+        function rePlay(){
+            document.getElementById('winnerModal').classList.remove('active');
         }
 
         function finishGameAndExit() {
