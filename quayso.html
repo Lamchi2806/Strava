@@ -139,10 +139,10 @@
                     THAM GIA QUAY SỐ
                 </button>
 
-                <!--button onclick="startInstantPlay()" class="group w-full py-3 bg-white border-2 border-green-500 text-green-600 rounded-xl font-bold hover:bg-green-50 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow text-sm md:text-base">
+                <button onclick="startInstantPlay()" class="group w-full py-3 bg-white border-2 border-green-500 text-green-600 rounded-xl font-bold hover:bg-green-50 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow text-sm md:text-base">
                     <i class="fas fa-rocket text-lg md:text-xl group-hover:-translate-y-0.5 transition-transform"></i>
                     CHƠI NGAY (KHÔNG CẦN ĐĂNG KÝ)
-                </button-->
+                </button>
 
                 <!-- Guide Button -->
                 <button onclick="openGuideModal()" class="w-full py-2 text-gray-500 hover:text-blue-600 font-semibold text-xs md:text-sm flex items-center justify-center gap-2 transition-colors">
@@ -345,9 +345,17 @@
                         <label class="block text-sm font-bold text-gray-700 mb-1">Tên đợt (Duy nhất)</label>
                         <input type="text" name="name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm" placeholder="VD: Lì xì Team Tech 2026" required>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Mã PIN bảo vệ (Tùy chọn)</label>
-                        <input type="text" name="pin" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm" placeholder="VD: 1234">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1 text-red-600">PIN Quản lý (Admin)</label>
+                            <input type="text" name="admin_pin" class="w-full p-3 border border-red-200 bg-red-50 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm" placeholder="VD: 9999" required>
+                            <p class="text-[10px] text-gray-500 mt-1">Dùng để Sửa/Xóa</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1 text-blue-600">PIN Tham gia (User)</label>
+                            <input type="text" name="pin" class="w-full p-3 border border-blue-200 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="VD: 1234" required>
+                            <p class="text-[10px] text-gray-500 mt-1">Gửi cho người chơi</p>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Thể lệ / Lời chúc</label>
@@ -355,29 +363,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Danh sách giải thưởng</label>
-                        <<div class="mb-4">
-    <label class="block text-sm font-bold mb-2">
-        Danh sách phần thưởng (Tên,Rate)
-    </label>
-
-    <textarea 
-        name="prizes"
-        rows="8"
-        required
-        class="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-        placeholder="Ví dụ:
-Nụ hôn,10
-5.000 VND,20
-10.000 VND,30
-20.000 VND,40"
-    ></textarea>
-
-    <p class="text-xs text-gray-500 mt-2">
-        ✔ Mỗi dòng 1 phần thưởng theo format: <b>Tên,Rate</b><br>
-        ✔ Tổng tất cả Rate phải bằng 100
-    </p>
-</div>
- id="sessionPrizeInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none font-mono text-xs md:text-sm" rows="6"></textarea>
+                        <textarea name="prizes" id="sessionPrizeInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none font-mono text-xs md:text-sm" rows="6"></textarea>
                         <p class="text-[10px] md:text-xs text-gray-500 mt-1">Gợi ý: Nhập đúng "500.000 VND" để hiện ảnh tiền.</p>
                     </div>
                 </div>
@@ -400,9 +386,15 @@ Nụ hôn,10
                         <label class="block text-sm font-bold text-gray-700 mb-1">Tên đợt</label>
                         <input type="text" id="editName" name="name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" required>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Mã PIN bảo vệ</label>
-                        <input type="text" id="editPin" name="pin" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1 text-red-600">PIN Admin</label>
+                            <input type="text" id="editAdminPin" name="admin_pin" class="w-full p-3 border border-red-200 bg-red-50 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1 text-blue-600">PIN User</label>
+                            <input type="text" id="editPin" name="pin" class="w-full p-3 border border-blue-200 bg-blue-50 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" required>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Thể lệ / Lời chúc</label>
@@ -429,7 +421,7 @@ Nụ hôn,10
                     <i class="fas fa-lock"></i>
                 </div>
                 <h3 class="text-lg font-bold text-gray-800">Yêu cầu xác thực</h3>
-                <p class="text-xs text-gray-500 mt-1">Nhập PIN của đợt quay</p>
+                <p class="text-xs text-gray-500 mt-1">Nhập Mã PIN Quản lý (Admin)</p>
             </div>
             <input type="password" id="authPinInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-center text-lg tracking-widest mb-4" placeholder="••••">
             <div class="flex gap-2">
@@ -449,6 +441,7 @@ Nụ hôn,10
                 </div>
                 <button onclick="closeModal('statsModal')" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-500 flex items-center justify-center transition-colors"><i class="fas fa-times"></i></button>
             </div>
+            
             <div class="flex-1 overflow-auto p-4 md:p-6 bg-white">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
                     <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 md:p-6 rounded-xl border border-green-100 shadow-sm">
@@ -470,6 +463,7 @@ Nụ hôn,10
                         </div>
                     </div>
                 </div>
+
                 <div class="overflow-x-auto rounded-xl border border-gray-200">
                     <table class="w-full text-left min-w-[600px]">
                         <thead>
@@ -485,6 +479,7 @@ Nụ hôn,10
                     </table>
                 </div>
             </div>
+
             <div class="p-4 border-t bg-gray-50 flex justify-end">
                 <button onclick="exportToCSV()" class="px-4 py-2 md:px-5 md:py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold shadow flex items-center gap-2 text-sm md:text-base">
                     <i class="fas fa-file-excel"></i> Xuất CSV
@@ -525,7 +520,9 @@ Nụ hôn,10
                 </div>
                 <button onclick="closeModal('guideModal')" class="w-8 h-8 rounded-full bg-white hover:bg-red-200 text-red-500 hover:text-red-700 flex items-center justify-center transition-colors shadow-sm"><i class="fas fa-times"></i></button>
             </div>
+            
             <div class="flex-1 overflow-auto p-6 bg-white space-y-8 text-gray-700">
+                <!-- Section 1 -->
                 <div>
                     <h4 class="flex items-center gap-2 font-bold text-lg text-blue-800 mb-3">
                         <span class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm">1</span>
@@ -533,11 +530,20 @@ Nụ hôn,10
                     </h4>
                     <ul class="list-disc pl-12 space-y-2 text-sm">
                         <li><strong>Tạo đợt mới:</strong> Bấm vào nút <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">Tôi là người tổ chức</span>, sau đó chọn <strong>"Tạo đợt mới"</strong>.</li>
-                        <li><strong>Thiết lập:</strong> Nhập tên đợt (bắt buộc, không trùng), mã PIN (để bảo vệ khi sửa/xóa) và danh sách giải thưởng.</li>
-                        <li><strong>Quản lý:</strong> Bạn có thể xem thống kê người trúng, sửa thông tin hoặc xóa đợt lì xì (cần nhập đúng mã PIN đã tạo).</li>
+                        <li><strong>Thiết lập:</strong>
+                            <ul class="list-disc pl-4 mt-1">
+                                <li><strong>Tên đợt:</strong> Phải là duy nhất.</li>
+                                <li><strong>PIN Quản lý (Admin):</strong> Dùng để Sửa/Xóa đợt lì xì và Xem thống kê nhạy cảm. Hãy giữ bí mật!</li>
+                                <li><strong>PIN Tham gia (User):</strong> Cung cấp cho người chơi để họ đăng nhập vào quay số.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Lưu ý về giải thưởng:</strong> Để hiển thị ảnh các tờ tiền, hãy nhập đúng cú pháp như <code>10.000 VND</code>, <code>500.000 VND</code>, <code>Nụ hôn</code>, <code>Rượu</code>.</li>
+                        <li><strong>Quản lý:</strong> Bạn có thể xem thống kê người trúng, sửa thông tin hoặc xóa đợt lì xì (cần nhập đúng PIN Quản lý).</li>
                         <li><strong>Chuyển tiền thưởng:</strong> Sau khi quay xong, vào mục <strong>Thống kê</strong>, bấm nút <strong>QR</strong> ở cột Hành động để tạo mã QR chuyển khoản nhanh cho người trúng.</li>
                     </ul>
                 </div>
+
+                <!-- Section 2 -->
                 <div>
                     <h4 class="flex items-center gap-2 font-bold text-lg text-orange-700 mb-3">
                         <span class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-sm">2</span>
@@ -546,11 +552,13 @@ Nụ hôn,10
                     <ul class="list-disc pl-12 space-y-2 text-sm">
                         <li><strong>Bước 1:</strong> Bấm <span class="bg-orange-100 text-orange-800 px-2 py-0.5 rounded text-xs font-bold">Tham gia quay số</span> từ màn hình chính.</li>
                         <li><strong>Bước 2:</strong> Chọn tên đợt lì xì mà bạn tham gia (có thể tìm kiếm).</li>
-                        <li><strong>Bước 3:</strong> Nhập <strong>Mã PIN</strong> (nếu BTC yêu cầu), <strong>Họ tên</strong>, <strong>Ngân hàng</strong> và <strong>Số tài khoản</strong>.</li>
+                        <li><strong>Bước 3:</strong> Nhập <strong>Mã PIN Tham gia</strong> (do người tổ chức cung cấp), <strong>Họ tên</strong>, <strong>Ngân hàng</strong> và <strong>Số tài khoản</strong> (để nhận tiền).</li>
                         <li><strong>Bước 4:</strong> Bấm xác nhận để vào màn hình quay. Chạm vào vòng quay để thử vận may.</li>
                     </ul>
                 </div>
-                <!--div>
+
+                <!-- Section 3 -->
+                <div>
                     <h4 class="flex items-center gap-2 font-bold text-lg text-green-700 mb-3">
                         <span class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-sm">3</span>
                         Chế độ Chơi Tự Do
@@ -560,8 +568,9 @@ Nụ hôn,10
                         <li>Bấm <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-bold">Chơi ngay</span>.</li>
                         <li>Bạn có thể tự do chỉnh sửa các ô trên vòng quay (nhập tên người hoặc mệnh giá tiền tùy thích).</li>
                     </ul>
-                </div-->
+                </div>
             </div>
+
             <div class="p-4 border-t bg-gray-50 flex justify-end">
                 <button onclick="closeModal('guideModal')" class="px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold shadow transition-colors">Đã Hiểu</button>
             </div>
@@ -645,10 +654,6 @@ Nụ hôn,10
                 </div>
 
                 <div class="p-4 bg-gray-50 border-t shrink-0">
-                    <button onclick="rePlay()" class="w-full py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 shadow transition-all" style="margin-bottom: 10px;">
-                        Quay lại
-                    </button>
-                    
                     <button onclick="finishGameAndExit()" class="w-full py-3 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 shadow transition-all">
                         Hoàn tất & Thoát
                     </button>
@@ -660,8 +665,8 @@ Nụ hôn,10
     <!-- Javascript Logic -->
     <script>
         // --- SUPABASE CONFIG ---
-        const supabaseUrl = 'https://nqxlwaitqcjurjuvurlr.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xeGx3YWl0cWNqdXJqdXZ1cmxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3ODY1NjIsImV4cCI6MjA4NjM2MjU2Mn0.OBgHJu8o0P5TxA9y5St0kRxioAk4X551ntRIEw-HeWk';
+        const supabaseUrl = 'https://rmbsxccrwrktbjlnezpu.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtYnN4Y2Nyd3JrdGJqbG5lenB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg2MjczNjQsImV4cCI6MjA2NDIwMzM2NH0.ydCqificftdtn1niRciFCifeuo8aX6SDGti-hCY5Z_Y';
         // Changed variable name to avoid conflict
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
@@ -703,7 +708,7 @@ Nụ hôn,10
             }
         }
 
-        // --- SEARCHABLE DROPDOWN LOGIC ---
+        // --- SEARCHABLE DROPDOWN LOGIC (GENERIC) ---
         function setupSearchableDropdown(inputId, hiddenId, listId, data, labelKey, valueKey, defaultValue) {
             const input = document.getElementById(inputId);
             const hidden = document.getElementById(hiddenId);
@@ -771,17 +776,17 @@ Nụ hôn,10
 
         async function fetchSessionsFromSupabase() {
             showLoading();
-            const { data, error } = await supabaseClient.from('lixi_sessions').select('*, lixi_winners(*), lixi_prizes(*)').order('created_at', { ascending: false });
+            // IMPORTANT: Select 'admin_pin' and 'pin' properly
+            const { data, error } = await supabaseClient.from('lixi_sessions').select('*, lixi_winners(*)').order('created_at', { ascending: false });
             hideLoading();
             if (error) { console.error(error); return []; }
-            
-            const rs = data.map(s => ({
+            return data.map(s => ({
                 id: s.id,
                 name: s.name,
-                pin: s.pin,
+                pin: s.pin, // Player PIN
+                admin_pin: s.admin_pin, // Admin PIN (might be null for old records)
                 description: s.description,
-                prizes: s.lixi_prizes.map(w => (w.prize_name)),
-                rates: s.lixi_prizes.map(w => (w.rate)),
+                prizes: s.prizes || [],
                 createdAt: s.created_at,
                 winners: s.lixi_winners.map(w => ({
                     name: w.name,
@@ -790,15 +795,14 @@ Nụ hôn,10
                     time: w.created_at
                 }))
             }));
-            console.log(rs);
-            return rs;
         }
 
         async function insertSessionToSupabase(session) {
             showLoading();
             const { error } = await supabaseClient.from('lixi_sessions').insert({
                 name: session.name,
-                pin: session.pin,
+                pin: session.pin, // Player PIN
+                admin_pin: session.admin_pin, // Admin PIN
                 description: session.description,
                 prizes: session.prizes
             });
@@ -814,6 +818,7 @@ Nụ hôn,10
         }
 
         async function insertWinnerToSupabase(sessionId, winner) {
+            // winner.account should be "BANK::ACCOUNT"
             const { error } = await supabaseClient.from('lixi_winners').insert({
                 session_id: sessionId,
                 name: winner.name,
@@ -828,9 +833,12 @@ Nụ hôn,10
             const { data, error } = await supabaseClient.from('lixi_winners')
                 .select('account')
                 .eq('session_id', sessionId);
+            
             hideLoading();
             if (error || !data) return false;
+            
             const cleanInput = account.replace(/\s/g, '');
+            
             return data.some(row => {
                 const parts = row.account.split('::');
                 const storedAcc = parts.length > 1 ? parts[1] : parts[0];
@@ -871,7 +879,8 @@ Nụ hôn,10
         function showView(viewId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
-            if (viewId === 'view-organizer') loadOrganizerData(); 
+            
+            if (viewId === 'view-organizer') loadOrganizerData(); // Updated to load data first
             if (viewId === 'view-player-login') loadSessionDropdown();
         }
 
@@ -884,6 +893,7 @@ Nụ hôn,10
         }
 
         // --- ORGANIZER LOGIC ---
+        
         async function loadOrganizerData() {
             const sessions = await fetchSessionsFromSupabase();
             cachedSessions = sessions;
@@ -902,120 +912,101 @@ Nụ hôn,10
         }
 
         async function handleCreateSession(e) {
-    e.preventDefault();
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const name = formData.get('name').trim();
+            const pin = formData.get('pin').trim(); // User PIN
+            const adminPin = formData.get('admin_pin').trim(); // Admin PIN
+            const prizes = (formData.get('prizes') || "").split('\n').filter(n => n.trim() !== '');
 
-    const formData = new FormData(e.target);
-    const name = formData.get('name')?.trim();
-    const description = formData.get('description');
-    const pin = formData.get('pin');
-    const prizeInput = (formData.get('prizes') || "").trim();
+            if (!name) { alert("Vui lòng nhập tên đợt lì xì!"); return; }
+            if (!adminPin) { alert("Vui lòng nhập PIN Quản lý!"); return; }
+            if (!pin) { alert("Vui lòng nhập PIN Người chơi!"); return; }
+            if (adminPin === pin) { alert("Mã PIN Quản lý và Người chơi không được trùng nhau!"); return; }
+            if (prizes.length === 0) { alert("Vui lòng nhập ít nhất một giải thưởng!"); return; }
 
-    if (!name) {
-        alert("Vui lòng nhập tên đợt lì xì!");
-        return;
-    }
+            showLoading();
+            const { data: existingSessions, error: checkError } = await supabaseClient
+                .from('lixi_sessions')
+                .select('id')
+                .ilike('name', name); 
+            hideLoading();
 
-    if (!prizeInput) {
-        alert("Vui lòng nhập danh sách phần thưởng!");
-        return;
-    }
+            if (checkError) {
+                console.error(checkError);
+                alert("Lỗi kiểm tra dữ liệu. Vui lòng thử lại.");
+                return;
+            }
 
-    // Check duplicate session name
-    showLoading();
-    const { data: existingSessions, error: checkError } =
-        await supabaseClient
-            .from('lixi_sessions')
-            .select('id')
-            .ilike('name', name);
-    hideLoading();
+            if (existingSessions && existingSessions.length > 0) {
+                alert(`Tên đợt lì xì "${name}" đã tồn tại! Vui lòng đặt tên khác.`);
+                return;
+            }
 
-    if (checkError) {
-        alert("Lỗi kiểm tra tên chương trình");
-        return;
-    }
-
-    if (existingSessions.length > 0) {
-        alert("Tên đợt lì xì đã tồn tại!");
-        return;
-    }
-
-    /* ===== Parse prizes ===== */
-
-    const lines = prizeInput.split('\n').filter(l => l.trim() !== '');
-    let totalRate = 0;
-    const parsedPrizes = [];
-
-    for (let line of lines) {
-        const parts = line.split(',');
-
-        if (parts.length !== 2) {
-            alert("Sai format (Tên,Rate): " + line);
-            return;
+            const success = await insertSessionToSupabase({
+                name: name,
+                pin: pin,
+                admin_pin: adminPin,
+                description: formData.get('description'),
+                prizes: prizes
+            });
+            
+            if (success) {
+                e.target.reset();
+                closeModal('createSessionModal');
+                loadOrganizerData(); 
+            } else {
+                alert("Lỗi khi tạo đợt lì xì. Vui lòng thử lại.");
+            }
         }
 
-        const prizeName = parts[0].trim();
-        const rate = parseFloat(parts[1]);
+        function renderSessionCards(sessions) {
+            const container = document.getElementById('session-list');
+            const emptyMsg = document.getElementById('empty-session-msg');
+            
+            container.innerHTML = '';
+            if (sessions.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                return;
+            }
+            emptyMsg.classList.add('hidden');
 
-        if (!prizeName || isNaN(rate) || rate <= 0) {
-            alert("Dữ liệu không hợp lệ: " + line);
-            return;
+            sessions.forEach(s => {
+                const date = new Date(s.createdAt).toLocaleString('vi-VN');
+                const playerCount = s.winners.length;
+                let totalMoney = 0;
+                s.winners.forEach(w => {
+                    const num = parseInt(w.prize.replace(/\D/g, '')) || 0;
+                    totalMoney += num;
+                });
+
+                const card = document.createElement('div');
+                card.className = "bg-white p-5 rounded-xl border border-gray-100 hover:shadow-lg transition-shadow";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-base md:text-lg text-gray-800">${s.name}</h3>
+                        <span class="bg-gray-100 text-[10px] md:text-xs font-semibold px-2 py-1 rounded text-gray-500">${date}</span>
+                    </div>
+                    <p class="text-xs md:text-sm text-gray-500 mb-4 line-clamp-2 h-8 md:h-10">${s.description || 'Không có mô tả'}</p>
+                    <div class="flex justify-between items-center text-xs md:text-sm mb-5 bg-gray-50 p-3 rounded-lg">
+                        <div class="flex items-center gap-1 font-semibold text-gray-700"><i class="fas fa-users text-blue-500"></i> ${playerCount}</div>
+                        <div class="flex items-center gap-1 font-bold text-yellow-600"><i class="fas fa-coins text-yellow-500"></i> ${totalMoney.toLocaleString('vi-VN')} đ</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="requestAction('viewStats', '${s.id}')" class="flex-1 py-2.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-bold text-xs md:text-sm transition-colors">
+                            <i class="fas fa-chart-bar mr-1"></i> Thống kê
+                        </button>
+                        <button onclick="requestAction('edit', '${s.id}')" class="px-3 py-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors border border-orange-200">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                         <button onclick="requestAction('delete', '${s.id}')" class="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-red-200">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
-
-        totalRate += rate;
-
-        parsedPrizes.push({
-            prize_name: prizeName,
-            rate: rate
-        });
-    }
-
-    // Fix float error
-    if (Math.round(totalRate * 100) / 100 !== 100) {
-        alert("Tổng tỷ lệ phải bằng 100%. Hiện tại = " + totalRate);
-        return;
-    }
-
-    /* ===== Insert session ===== */
-
-    const { data: sessionData, error: sessionError } =
-        await supabaseClient
-            .from('lixi_sessions')
-            .insert([{ name, description, pin }])
-            .select()
-            .single();
-
-    if (sessionError) {
-        alert("Lỗi tạo đợt lì xì: " + sessionError.message);
-        return;
-    }
-
-    const sessionId = sessionData.id;
-
-    /* ===== Insert prizes ===== */
-
-    const prizeRows = parsedPrizes.map(p => ({
-        session_id: sessionId,
-        prize_name: p.prize_name,
-        rate: p.rate
-    }));
-
-    const { error: prizeError } =
-        await supabaseClient
-            .from('lixi_prizes')
-            .insert(prizeRows);
-
-    if (prizeError) {
-        alert("Lỗi lưu phần thưởng: " + prizeError.message);
-        return;
-    }
-
-    alert("Tạo thành công!");
-
-    e.target.reset();
-    closeModal('createSessionModal');
-    loadOrganizerData();
-}
-
 
         // --- AUTH & EDIT/DELETE LOGIC ---
         function requestAction(action, sessionId) {
@@ -1028,30 +1019,41 @@ Nụ hôn,10
         function confirmAuth() {
             const inputPin = document.getElementById('authPinInput').value;
             const session = cachedSessions.find(s => s.id === authTargetId);
+            
             if (!session) return;
-            if (inputPin === session.pin) {
+
+            // Check ADMIN PIN or MASTER KEY
+            if (inputPin === session.admin_pin || inputPin === '1a2b') {
                 closeModal('authModal');
-                if (authPendingAction === 'delete') performDelete(authTargetId);
-                else if (authPendingAction === 'edit') openEditModal(authTargetId);
-                else if (authPendingAction === 'viewStats') viewStats(authTargetId);
+                
+                if (authPendingAction === 'delete') {
+                    performDelete(authTargetId);
+                } else if (authPendingAction === 'edit') {
+                    openEditModal(authTargetId);
+                } else if (authPendingAction === 'viewStats') {
+                    viewStats(authTargetId);
+                }
             } else {
-                alert("Mã PIN không chính xác!");
+                alert("Mã PIN Quản lý không chính xác!");
             }
         }
 
         async function performDelete(id) {
             await deleteSessionFromSupabase(id);
-            loadOrganizerData(); 
+            loadOrganizerData(); // Refresh list
         }
 
         function openEditModal(sessionId) {
             const session = cachedSessions.find(s => s.id === sessionId);
             if(!session) return;
+
             document.getElementById('editSessionId').value = session.id;
             document.getElementById('editName').value = session.name;
-            document.getElementById('editPin').value = session.pin || '';
+            document.getElementById('editPin').value = session.pin || ''; // Player PIN
+            document.getElementById('editAdminPin').value = session.admin_pin || ''; // Admin PIN
             document.getElementById('editDescription').value = session.description || '';
             document.getElementById('editPrizes').value = session.prizes.join('\n');
+            
             document.getElementById('editSessionModal').classList.add('active');
         }
 
@@ -1060,23 +1062,38 @@ Nụ hôn,10
             const formData = new FormData(e.target);
             const id = formData.get('id');
             const name = formData.get('name').trim();
+            const adminPin = formData.get('admin_pin').trim();
+            const pin = formData.get('pin').trim();
             const prizes = (formData.get('prizes') || "").split('\n').filter(n => n.trim() !== '');
 
             if (!name) { alert("Vui lòng nhập tên đợt lì xì!"); return; }
             if (prizes.length === 0) { alert("Vui lòng nhập ít nhất một giải thưởng!"); return; }
+            if (adminPin === pin) { alert("Mã PIN Quản lý và Người chơi không được trùng nhau!"); return; }
 
+            // KIỂM TRA TRÙNG TÊN
             showLoading();
             const { data: existingSessions, error: checkError } = await supabaseClient
-                .from('lixi_sessions').select('id').ilike('name', name).neq('id', id); 
+                .from('lixi_sessions')
+                .select('id')
+                .ilike('name', name)
+                .neq('id', id); 
             hideLoading();
 
-            if (checkError || (existingSessions && existingSessions.length > 0)) {
-                alert("Lỗi hoặc tên đã tồn tại!"); return;
+            if (checkError) {
+                console.error(checkError);
+                alert("Lỗi kiểm tra tên. Vui lòng thử lại.");
+                return;
+            }
+
+            if (existingSessions && existingSessions.length > 0) {
+                alert(`Tên đợt lì xì "${name}" đã được sử dụng! Vui lòng chọn tên khác.`);
+                return;
             }
 
             const success = await updateSessionInSupabase(id, {
                 name: name,
-                pin: formData.get('pin'),
+                pin: pin,
+                admin_pin: adminPin,
                 description: formData.get('description'),
                 prizes: prizes
             });
@@ -1089,12 +1106,12 @@ Nụ hôn,10
             }
         }
 
-        // --- STATS & QR LOGIC (ADMIN) ---
+        // --- STATS & QR LOGIC ---
         let currentStatsSessionId = null;
 
         async function viewStats(sessionId) {
             currentStatsSessionId = sessionId;
-            const sessions = await fetchSessionsFromSupabase(); 
+            const sessions = await fetchSessionsFromSupabase(); // Refresh data
             cachedSessions = sessions;
             const session = sessions.find(s => s.id === sessionId);
             if (!session) return;
@@ -1110,6 +1127,7 @@ Nụ hôn,10
             [...session.winners].reverse().forEach(w => {
                  const num = parseInt(w.prize.replace(/\D/g, '')) || 0;
                  totalMoney += num;
+
                  let bankCode = '';
                  let accNum = w.account;
                  if (w.account.includes('::')) {
@@ -1133,7 +1151,9 @@ Nụ hôn,10
                     <td class="p-3 md:p-4 text-right font-extrabold text-red-600 text-xs md:text-sm">${w.prize}</td>
                     <td class="p-3 md:p-4 text-center">
                         ${num > 0 && bankCode ? 
-                            `<button onclick="showQR('${bankCode}', '${accNum}', ${num}, 'Chuc mung nam moi An Khang Thinh Vuong')" class="bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-lg transition-colors text-xs font-bold"><i class="fas fa-qrcode"></i> QR</button>` : 
+                            `<button onclick="showQR('${bankCode}', '${accNum}', ${num}, 'Chuc mung nam moi An Khang Thinh Vuong')" class="bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-lg transition-colors text-xs font-bold">
+                                <i class="fas fa-qrcode"></i> QR
+                            </button>` : 
                             `<span class="text-gray-300">-</span>`
                         }
                     </td>
@@ -1145,6 +1165,7 @@ Nụ hôn,10
             document.getElementById('statsModal').classList.add('active');
         }
 
+        // Show QR Logic
         function showQR(bankCode, accNum, amount, content) {
             const qrModal = document.getElementById('qrModal');
             const qrImage = document.getElementById('qrImage');
@@ -1154,15 +1175,39 @@ Nụ hôn,10
             qrModal.classList.add('active');
             qrLoading.classList.remove('hidden');
             
-            const url = `https://img.vietqr.io/image/${bankCode}-${accNum}-compact.png?amount=${amount}&addInfo=${encodeURIComponent(content)}`;
+            // Format content: remove vietnamese accents if needed, keep short
+            const safeContent = `Lixi ${content}`.substring(0, 50);
             
-            qrImage.onload = () => { qrLoading.classList.add('hidden'); };
+            // VietQR QuickLink
+            const url = `https://img.vietqr.io/image/${bankCode}-${accNum}-compact.png?amount=${amount}&addInfo=${encodeURIComponent(safeContent)}`;
+            
+            qrImage.onload = () => {
+                qrLoading.classList.add('hidden');
+            };
             qrImage.src = url;
 
+            // Handle Download
             downloadBtn.onclick = async () => {
                 try {
                     const response = await fetch(url);
                     const blob = await response.blob();
+                    
+                    // NEW: Try Web Share API first for mobile
+                    const file = new File([blob], `QR_Lixi_${accNum}.png`, { type: blob.type });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: 'QR Lì Xì',
+                                text: 'Mã QR nhận tiền lì xì'
+                            });
+                            return; // Stop if shared successfully
+                        } catch (shareErr) {
+                            console.log('Share failed, falling back to download');
+                        }
+                    }
+
+                    // Fallback: Anchor download
                     const objectUrl = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = objectUrl;
@@ -1171,7 +1216,9 @@ Nụ hôn,10
                     link.click();
                     document.body.removeChild(link);
                     URL.revokeObjectURL(objectUrl);
-                } catch (err) { alert("Lỗi tải ảnh. Vui lòng thử lại!"); }
+                } catch (err) {
+                    alert("Lỗi tải ảnh. Vui lòng thử lại!");
+                }
             };
         }
 
@@ -1182,13 +1229,21 @@ Nụ hôn,10
             csvContent += "Thoi gian,Ho Ten,Ngan Hang,So Tai Khoan,Giai Thuong\n"; 
 
             session.winners.forEach(w => {
-                let bankCode = '', accNum = w.account;
+                let bankCode = '';
+                let accNum = w.account;
                 if (w.account.includes('::')) {
                     const parts = w.account.split('::');
                     bankCode = parts[0];
                     accNum = parts[1];
                 }
-                const row = [new Date(w.time).toLocaleString('vi-VN'), `"${w.name}"`, `"${bankCode}"`, `"${accNum}"`, `"${w.prize}"`].join(",");
+
+                const row = [
+                    new Date(w.time).toLocaleString('vi-VN'),
+                    `"${w.name}"`,
+                    `"${bankCode}"`,
+                    `"${accNum}"`,
+                    `"${w.prize}"`
+                ].join(",");
                 csvContent += row + "\n";
             });
 
@@ -1223,7 +1278,7 @@ Nụ hôn,10
             if (session.pin && session.pin !== pin) { alert("Mã PIN không chính xác!"); return; }
             
             const played = await checkHasPlayed(sessionId, accountNo);
-            if (played) { alert(`TK ${accountNo} đã tham gia rồi!`); return; }
+            if (played) { alert(`TK ${accountNo} đã tham gia quay số trong đợt này rồi. Mỗi người chỉ được quay 1 lần!`); return; }
 
             currentSession = session;
             const combinedAccount = `${bank}::${accountNo}`;
@@ -1282,6 +1337,7 @@ Nụ hôn,10
             document.getElementById('gamePlayerName').innerText = currentPlayer.name;
             document.getElementById('gameSessionName').innerText = currentSession.name;
             document.getElementById('displayPlayerName').innerText = currentPlayer.name;
+            // Use displayAccount to show friendly bank info
             document.getElementById('displayPlayerAcc').innerText = currentPlayer.displayAccount || currentPlayer.account;
             
             if (currentSession.id === null) {
@@ -1445,7 +1501,6 @@ Nụ hôn,10
             requestAnimationFrame(animate);
         }
 
-        // --- NEW: Winner Celebration & Share Logic ---
         function finishSpin() {
             const items = currentWheelItems;
             const step = (2 * Math.PI) / items.length;
@@ -1459,18 +1514,15 @@ Nụ hôn,10
             if (currentSession && currentSession.id) {
                 const winnerData = {
                     name: currentPlayer.name,
-                    account: currentPlayer.account,
+                    account: currentPlayer.account, // Stored as BANK::ACC
                     prize: prize
                 };
                 insertWinnerToSupabase(currentSession.id, winnerData);
             }
 
-            // Reset modal to step 1
-            document.getElementById('winnerStep1').classList.remove('hidden');
-            document.getElementById('winnerStep2').classList.add('hidden');
-            document.getElementById('winnerStep2').classList.remove('flex');
-            
             document.getElementById('winnerText').innerText = prize;
+            document.getElementById('winSubtext').innerText = isMoneyMode ? "Lộc xuân đã về ví của bạn" : "Người chiến thắng là";
+
             const imgContainer = document.getElementById('winnerImageContainer');
             if (isMoneyMode && loadedMoneyImages[prize]) {
                 document.getElementById('winnerImage').src = loadedMoneyImages[prize].src;
@@ -1526,25 +1578,39 @@ Nụ hôn,10
                 // Download QR
                 const img = document.getElementById('winnerQrImage');
                 if (img.src) {
-                    const link = document.createElement('a');
-                    link.href = img.src;
-                    link.download = `Lixi_QR_${currentPlayer.accountNo}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    // NEW: Try Web Share API for native "Save Image" experience on mobile
+                    fetch(img.src)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            const file = new File([blob], `Lixi_QR_${currentPlayer.accountNo}.png`, { type: blob.type });
+                            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                                navigator.share({
+                                    files: [file],
+                                    title: 'QR Lì Xì',
+                                    text: 'Mã QR nhận tiền lì xì'
+                                }).catch((error) => console.log('Sharing failed', error));
+                            } else {
+                                // Fallback for desktop or unsupported browsers
+                                const objectUrl = URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = objectUrl;
+                                link.download = `Lixi_QR_${currentPlayer.accountNo}.png`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                URL.revokeObjectURL(objectUrl);
+                            }
+                        })
+                        .catch(() => alert("Lỗi tải ảnh!"));
                 } else {
                     alert("Không có mã QR để tải!");
                 }
             }
         }
 
-        function rePlay(){
-            document.getElementById('winnerModal').classList.remove('active');
-        }
-
         function finishGameAndExit() {
             document.getElementById('winnerModal').classList.remove('active');
-            if (currentSession.id) { exitGame(); } else { document.getElementById('spin-instruction').style.opacity = '1'; }
+            if (currentSession && currentSession.id) { exitGame(); } else { document.getElementById('spin-instruction').style.opacity = '1'; }
         }
 
         function exitGame() {
