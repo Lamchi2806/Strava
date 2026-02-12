@@ -758,6 +758,17 @@
 
         // For session mode: keep weighted prizes here (null for instant mode)
         let currentWheelPrizeObjects = null;
+        // Pick a prize index by rate (probability), while keeping the wheel UI equal slices
+        function chooseWeightedIndex(prizes) {
+            const total = prizes.reduce((s, p) => s + (Number.isFinite(p.rate) ? p.rate : 0), 0);
+            let r = Math.random() * total;
+            for (let i = 0; i < prizes.length; i++) {
+                r -= prizes[i].rate;
+                if (r <= 0) return i;
+            }
+            return prizes.length - 1;
+        }
+
 
         function buildSegmentsFromPrizes(prizes) {
             const total = prizes.reduce((s, p) => s + p.rate, 0);
@@ -917,7 +928,7 @@
                     pin: session.pin, // Player PIN
                     admin_pin: session.admin_pin, // Admin PIN
                     description: session.description,
-                    // Chỉ lưu tên giải ở sessions; tỉ lệ lưu ở bảng lixi_prizers
+                    // Chỉ lưu tên giải ở sessions; tỉ lệ lưu ở bảng lixi_prizes
                     prizes: session.prizes
                 })
                 .select('id')
@@ -942,17 +953,19 @@
         }
 
         // --- PRIZERS (RATE) STORE ---
-        // Bảng: lixi_prizers(id, session_id(FK), prize_name, rate, rate_created_at)
+        // Bảng: lixi_prizes(id, session_id(FK), prize_name, rate, created_at)
         // - session_id: khóa phụ trỏ tới lixi_sessions.id
         // - rate: tỉ lệ % (0..100)
-        // - rate_created_at: thời điểm set tỉ lệ (có thể default now() trong DB)
+        // - created_at: thời điểm set tỉ lệ (có thể default now() trong DB)
 
         async function replacePrizersInSupabase(sessionId, prizeObjs) {
             if (!sessionId) return false;
 
+            const id_session = sessionId.trim();
+
             // prizeObjs: [{label, rate}]
             const rows = prizeObjs.map(p => ({
-                session_id: sessionId,
+                session_id: id_session,
                 prize_name: p.label,
                 rate: p.rate,
                 created_at: new Date().toISOString()
@@ -963,7 +976,7 @@
             const { error: delErr } = await supabaseClient
                 .from('lixi_prizes')
                 .delete()
-                .eq('session_id', sessionId);
+                .eq('session_id', id_session);
 
             if (delErr) {
                 hideLoading();
@@ -1108,6 +1121,7 @@
         async function loadOrganizerData() {
             const sessions = await fetchSessionsFromSupabase();
             cachedSessions = sessions;
+            console.log("aaaaaaaaaaaaaaaaaaaa",sessions);
             renderSessionCards(sessions);
         }
 
@@ -1172,7 +1186,7 @@
                 return;
             }
 
-            // 2) Lưu tỉ lệ vào bảng lixi_prizers
+            // 2) Lưu tỉ lệ vào bảng lixi_prizes
             const okRate = await replacePrizersInSupabase(newSessionId, prizeObjs);
             if (!okRate) {
                 alert("Đã tạo đợt nhưng lưu tỉ lệ giải thưởng thất bại. Vui lòng vào Sửa để cập nhật lại.");
@@ -1234,7 +1248,7 @@
         // --- AUTH & EDIT/DELETE LOGIC ---
         function requestAction(action, sessionId) {
             authPendingAction = action;
-            authTargetId = sessionId;
+            authTargetId = sessionId.trim();
             document.getElementById('authPinInput').value = '';
             document.getElementById('authModal').classList.add('active');
         }
@@ -1276,7 +1290,7 @@
             document.getElementById('editAdminPin').value = session.admin_pin || ''; // Admin PIN
             document.getElementById('editDescription').value = session.description || '';
 
-            // Ưu tiên load từ bảng lixi_prizers
+            // Ưu tiên load từ bảng lixi_prizes
             const prizers = await fetchPrizersFromSupabase(session.id);
             if (prizers && prizers.length) {
                 document.getElementById('editPrizes').value = prizers.map(p => `${p.label},${Number(p.rate).toFixed(2)}`).join('\n');
@@ -1529,7 +1543,7 @@
                 displayAccount: "Không cần nhập thông tin"
             };
 
-            // Load prizers + rate từ bảng lixi_prizers
+            // Load prizers + rate từ bảng lixi_prizes
             const prizers = await fetchPrizersFromSupabase(session.id);
             if (!validatePrizeObjectsOrAlert(prizers)) return;
 
@@ -1553,6 +1567,7 @@
         const ctx = canvas.getContext('2d');
         let currentRotation = 0;
         let isSpinning = false;
+        let plannedWinningIndex = null; // used in session mode (rate-based pick)
         let loadedMoneyImages = {};
 
         function preloadImages() {
@@ -1630,9 +1645,8 @@
                 list.forEach(p => {
                     const li = document.createElement('li');
                     li.className = "flex items-center justify-between gap-2 p-2 bg-gray-50 rounded border border-gray-100";
-                    // const rateText = (p.rate != null) ? `<span class="text-[11px] font-bold text-gray-500">${p.rate.toFixed(2)}%</span>` : '';
-                    const rateText = '';
-                    li.innerHTML = `<div class="flex items-center gap-2"><i class="fas fa-gift text-green-500"></i><span class="font-bold text-gray-700">${p.label}</span></div>${rateText}`;
+                    const rateText = (p.rate != null) ? `<span class="text-[11px] font-bold text-gray-500">${p.rate.toFixed(2)}%</span>` : '';
+                    li.innerHTML = `<div class="flex items-center gap-2"><i class="fas fa-gift text-green-500"></i><span class="font-bold text-gray-700">${p.label}</span></div>`;
                     prizeListDisplay.appendChild(li);
                 });
                 return;
@@ -1675,113 +1689,76 @@ function drawWheel() {
 
             ctx.clearRect(0, 0, width, height);
 
-            const isSessionWeighted = !!(currentSession && currentSession.id && currentWheelPrizeObjects && currentWheelPrizeObjects.length);
-            const segments = isSessionWeighted ? buildSegmentsFromPrizes(currentWheelPrizeObjects) : null;
-
             const items = currentWheelItems;
             if (!items || items.length === 0) return;
+
+            const step = (2 * Math.PI) / items.length;
 
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(currentRotation);
 
-            if (!isSessionWeighted) {
-                const step = (2 * Math.PI) / items.length;
-                for (let i = 0; i < items.length; i++) {
-                    const start = i * step;
-                    const end = (i + 1) * step;
-                    const val = items[i];
+            for (let i = 0; i < items.length; i++) {
+                const start = i * step;
+                const end = (i + 1) * step;
+                const val = items[i];
 
-                    ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.arc(0, 0, radius, start, end);
-                    ctx.closePath();
-                    ctx.fillStyle = segmentColors[i % segmentColors.length];
-                    ctx.fill();
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = "#fff";
-                    ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.arc(0, 0, radius, start, end);
+                ctx.closePath();
+                ctx.fillStyle = segmentColors[i % segmentColors.length];
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = "#fff";
+                ctx.stroke();
 
-                    ctx.save();
-                    ctx.rotate(start + (end - start) / 2);
+                // Content (image/text) centered in the slice
+                ctx.save();
+                const mid = start + step / 2;
+                ctx.rotate(mid);
 
-                    if (loadedMoneyImages[val]) {
-                        const img = loadedMoneyImages[val];
-                        const aspectRatio = img.width / img.height;
-                        const drawHeight = radius * 0.35;
-                        const drawWidth = drawHeight * aspectRatio;
-                        const startX = radius * 0.2;
+                // Scale content based on slice size so it doesn't overflow
+                const arcLen = radius * step; // approximate arc length at outer radius
+                const baseImgH = radius * 0.35;
+                const maxImgHByArc = arcLen * 0.55;
+                const drawHeight = Math.max(18, Math.min(baseImgH, maxImgHByArc));
 
-                        let finalWidth = drawWidth;
-                        let finalHeight = drawHeight;
-                        if (startX + finalWidth > radius - 10) {
-                            const scale = (radius - 10 - startX) / finalWidth;
-                            finalWidth *= scale;
-                            finalHeight *= scale;
-                        }
-                        ctx.drawImage(img, startX, -finalHeight / 2, finalWidth, finalHeight);
-                    } else {
-                        ctx.textAlign = "right";
-                        ctx.fillStyle = "#fff";
-                        const fontSize = Math.min(20 + 200 / items.length, 28);
-                        ctx.font = `bold ${fontSize}px Montserrat, Arial`;
-                        ctx.shadowColor = "rgba(0,0,0,0.3)";
-                        ctx.shadowBlur = 2;
-                        ctx.fillText(val, radius - 20, 8);
+                if (loadedMoneyImages[val]) {
+                    const img = loadedMoneyImages[val];
+                    const aspectRatio = img.width / img.height;
+                    let finalHeight = drawHeight;
+                    let finalWidth = finalHeight * aspectRatio;
+
+                    // Position closer to center when slices are small
+                    const startX = (step < 0.35 ? radius * 0.12 : radius * 0.2);
+
+                    // Clamp to fit inside radius
+                    if (startX + finalWidth > radius - 12) {
+                        const scale = (radius - 12 - startX) / finalWidth;
+                        finalWidth *= scale;
+                        finalHeight *= scale;
                     }
+                    ctx.drawImage(img, startX, -finalHeight / 2, finalWidth, finalHeight);
+                } else {
+                    ctx.textAlign = "right";
+                    ctx.fillStyle = "#fff";
+                    const fontSize = Math.max(10, Math.min(28, arcLen * 0.14));
+                    ctx.font = `bold ${fontSize}px Montserrat, Arial`;
+                    ctx.shadowColor = "rgba(0,0,0,0.3)";
+                    ctx.shadowBlur = 2;
 
-                    ctx.restore();
+                    // Move text inwards when slice is tight
+                    const textX = (step < 0.35 ? radius - 30 : radius - 20);
+                    ctx.fillText(val, textX, 8);
                 }
-            } else {
-                for (let i = 0; i < segments.length; i++) {
-                    const seg = segments[i];
-                    const val = seg.label;
 
-                    ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.arc(0, 0, radius, seg.start, seg.end);
-                    ctx.closePath();
-                    ctx.fillStyle = segmentColors[i % segmentColors.length];
-                    ctx.fill();
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = "#fff";
-                    ctx.stroke();
-
-                    ctx.save();
-                    const mid = (seg.start + seg.end) / 2;
-                    ctx.rotate(mid);
-
-                    if (loadedMoneyImages[val]) {
-                        const img = loadedMoneyImages[val];
-                        const aspectRatio = img.width / img.height;
-                        const drawHeight = radius * 0.35;
-                        const drawWidth = drawHeight * aspectRatio;
-                        const startX = radius * 0.2;
-
-                        let finalWidth = drawWidth;
-                        let finalHeight = drawHeight;
-                        if (startX + finalWidth > radius - 10) {
-                            const scale = (radius - 10 - startX) / finalWidth;
-                            finalWidth *= scale;
-                            finalHeight *= scale;
-                        }
-                        ctx.drawImage(img, startX, -finalHeight / 2, finalWidth, finalHeight);
-                    } else {
-                        ctx.textAlign = "right";
-                        ctx.fillStyle = "#fff";
-                        const fontSize = Math.min(20 + 200 / items.length, 28);
-                        ctx.font = `bold ${fontSize}px Montserrat, Arial`;
-                        ctx.shadowColor = "rgba(0,0,0,0.3)";
-                        ctx.shadowBlur = 2;
-                        ctx.fillText(val, radius - 20, 8);
-                    }
-
-                    ctx.restore();
-                }
+                ctx.restore();
             }
 
             ctx.restore();
         }
+
 
         function startSpin() {
             if (isSpinning || currentWheelItems.length === 0) return;
@@ -1809,14 +1786,34 @@ function drawWheel() {
 
             const duration = 7000;
             const startTimestamp = performance.now();
-            const randomOffset = Math.random() * 2 * Math.PI; // uniform -> weighted by segment size
-            const totalRotationNeeded = (15 * Math.PI * 2) + randomOffset;
             const startAngle = currentRotation;
 
+            const n = currentWheelItems.length;
+            const step = (2 * Math.PI) / n;
+
+            // Session mode: pick result by rate, but UI wheel stays equal slices
+            plannedWinningIndex = null;
+            if (currentSession && currentSession.id && currentWheelPrizeObjects && currentWheelPrizeObjects.length) {
+                plannedWinningIndex = chooseWeightedIndex(currentWheelPrizeObjects);
+            }
+
+            // Decide a target index (uniform for instant mode)
+            const targetIndex = (plannedWinningIndex != null)
+                ? plannedWinningIndex
+                : Math.floor(Math.random() * n);
+
+            // Aim for the middle of the target slice (plus a tiny jitter)
+            const jitter = (Math.random() - 0.5) * step * 0.18;
+            const desiredNormalized = normalizeAngle((2 * Math.PI) - ((targetIndex + 0.5) * step) + jitter);
+
+            const startNorm = normalizeAngle(startAngle);
+            let delta = desiredNormalized - startNorm;
+            delta = normalizeAngle(delta);
+
+            const spins = 10 + Math.floor(Math.random() * 6); // 10-15 vòng
+            const totalRotationNeeded = (spins * Math.PI * 2) + delta;
+
             let lastIndex = -1;
-            const isSessionWeighted = !!(currentSession && currentSession.id && currentWheelPrizeObjects && currentWheelPrizeObjects.length);
-            const segments = isSessionWeighted ? buildSegmentsFromPrizes(currentWheelPrizeObjects) : null;
-            const step = (!isSessionWeighted) ? ((2 * Math.PI) / currentWheelItems.length) : null;
 
             function animate(timestamp) {
                 const elapsed = timestamp - startTimestamp;
@@ -1825,13 +1822,8 @@ function drawWheel() {
 
                 currentRotation = startAngle + (totalRotationNeeded * ease);
 
-                let currentIndex = 0;
-                if (!isSessionWeighted) {
-                    const normalizedRot = normalizeAngle(currentRotation);
-                    currentIndex = Math.floor((2 * Math.PI - normalizedRot) / step) % currentWheelItems.length;
-                } else {
-                    currentIndex = getSegmentIndexFromRotation(currentRotation, segments);
-                }
+                const normalizedRot = normalizeAngle(currentRotation);
+                const currentIndex = Math.floor((2 * Math.PI - normalizedRot) / step) % n;
 
                 if (currentIndex !== lastIndex && progress < 1) {
                     playTick();
@@ -1850,20 +1842,21 @@ function drawWheel() {
             requestAnimationFrame(animate);
         }
 
+
         function finishSpin() {
             const items = currentWheelItems;
+            const n = items.length;
+            const step = (2 * Math.PI) / n;
 
-            const isSessionWeighted = !!(currentSession && currentSession.id && currentWheelPrizeObjects && currentWheelPrizeObjects.length);
             let winningIndex = 0;
 
-            if (!isSessionWeighted) {
-                const step = (2 * Math.PI) / items.length;
-                const normalizedRotation = normalizeAngle(currentRotation);
-                winningIndex = Math.floor(((2 * Math.PI) - normalizedRotation) / step) % items.length;
-                if (winningIndex < 0) winningIndex += items.length;
+            // Session mode: use planned index (picked by rate) for correct probability
+            if (currentSession && currentSession.id && plannedWinningIndex != null) {
+                winningIndex = plannedWinningIndex;
             } else {
-                const segments = buildSegmentsFromPrizes(currentWheelPrizeObjects);
-                winningIndex = getSegmentIndexFromRotation(currentRotation, segments);
+                const normalizedRotation = normalizeAngle(currentRotation);
+                winningIndex = Math.floor(((2 * Math.PI) - normalizedRotation) / step) % n;
+                if (winningIndex < 0) winningIndex += n;
             }
 
             const prize = items[winningIndex];
@@ -1888,6 +1881,9 @@ function drawWheel() {
                     insertWinnerToSupabase(currentSession.id, winnerData);
                 }
             }
+
+            // Reset planned index after we used it
+            plannedWinningIndex = null;
 
             document.getElementById('winnerText').innerText = prize;
             document.getElementById('winSubtext').innerText = isMoneyMode ? "Lộc xuân đã về ví của bạn" : "Người chiến thắng là";
@@ -1916,6 +1912,7 @@ function drawWheel() {
             document.getElementById('winnerModal').classList.add('active');
             confetti({ particleCount: 200, spread: 120, origin: { y: 0.6 }, colors: ['#e53935', '#ffeb3b', '#43a047'] });
         }
+
 
         function winnerPrimaryClick() {
             // Session mode: quay nhiều lần -> nút chính sẽ là "Quay tiếp"
